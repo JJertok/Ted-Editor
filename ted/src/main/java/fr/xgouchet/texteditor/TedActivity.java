@@ -364,36 +364,39 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     public void bracketsController(CharSequence s, int start) {
 
-        String str = s.toString();
+        StringBuilder sb = new StringBuilder();
+        sb = sb.append(s,0,start+1);
 
-        switch (str.charAt(str.length() - 1)) {
+        switch (sb.charAt(start)) {
             case '(':
-                str += ')';
-                mWatcher.afterChange(str, start, 0, 1);
-                mEditor.append(")");
-                mEditor.setSelection(mEditor.length() - 1);
+                sb.append(')');
+                sb.append(s,start+1,s.length());
+                mWatcher.afterChange(sb.toString(), start, 0, 1);
+                mEditor.getText().insert(start+1,")");
+                mEditor.setSelection(start+1);
                 break;
             case '{':
-                str += '}';
-                mWatcher.afterChange(str, start, 0, 1);
-                mEditor.append("}");
-                mEditor.setSelection(mEditor.length() - 1);
+                sb.append('}');
+                sb.append(s,start+1,s.length());
+                mWatcher.afterChange(sb.toString(), start, 0, 1);
+                mEditor.getText().insert(start+1,"}");
+                mEditor.setSelection(start+1);
                 break;
             case '[':
-                str += ']';
-                mWatcher.afterChange(str, start, 0, 1);
-                mEditor.append("]");
-                mEditor.setSelection(mEditor.length() - 1);
+                sb.append(']');
+                sb.append(s,start+1,s.length());
+                mWatcher.afterChange(sb.toString(), start, 0, 1);
+                mEditor.getText().insert(start+1,"]");
+                mEditor.setSelection(start+1);
                 break;
             case '<':
-                str += '>';
-                mWatcher.afterChange(str, start, 0, 1);
-                mEditor.append(">");
-                mEditor.setSelection(mEditor.length() - 1);
+                sb.append('>');
+                sb.append(s,start+1,s.length());
+                mWatcher.afterChange(sb.toString(), start, 0, 1);
+                mEditor.getText().insert(start+1,">");
+                mEditor.setSelection(start+1);
                 break;
-
         }
-
     }
 
     /**
@@ -1122,10 +1125,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected boolean mWarnedShouldQuit;
     protected boolean mDoNotBackup;
     /**
-     * Backspace tracking
+     * Brackets checker
      */
     protected int beforeLength;
-
     /**
      * are we in a post activity result ?
      */
