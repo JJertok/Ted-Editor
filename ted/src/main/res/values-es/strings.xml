@@ -59,6 +59,7 @@
     <string name="menu_about">Acerca de</string>
     <string name="menu_search">Buscar</string>
     <string name="menu_undo">Deshacer</string>
+    <string name="menu_redo">Rehacer</string>
     <string name="menu_quit">Salir</string>
 
     <!-- Misc UI strings -->

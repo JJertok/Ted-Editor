@@ -15,6 +15,15 @@ public interface TextChange extends Constants {
 	public int undo(Editable text);
 
 	/**
+	 * Redo this change
+	 *
+	 * @param text
+	 *            the editable object on which the redo is done
+	 * @return the caret position after the redo
+	 */
+	public int redo(Editable text);
+
+	/**
 	 * Method is deprecated, you should use the canMergeXXX methods instead
 	 * 
 	 * @return the caret position after this change

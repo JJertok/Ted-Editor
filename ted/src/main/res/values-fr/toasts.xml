@@ -26,6 +26,7 @@
     <string name="toast_search_no_input">"Recherche vide"</string>
     <string name="toast_filename_empty">Le nom de fichier ne doit pas être vide</string>
     <string name="toast_warn_no_undo">Rien à annuler</string>
+    <string name="toast_warn_no_redo">Rien à refaire plus</string>
     <string name="toast_warn_no_undo_will_quit">"Rien à annuler. Pressez retour pour quitter l'application"</string>
     <string name="toast_open_home_page_error">"Fichier par défaut non trouvé. Essayez d'en sélectionner un autre dans les options"</string>
     <string name="toast_home_page_cant_read">"Impossible d'ouvrir, le fichier par défaut est protégé en lecture"</string>

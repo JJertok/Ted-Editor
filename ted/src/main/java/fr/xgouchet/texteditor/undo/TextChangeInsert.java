@@ -115,6 +115,14 @@ public class TextChangeInsert implements TextChange {
 	}
 
 	/**
+	 * @see fr.xgouchet.texteditor.redo.TextChange#redo(java.lang.String)
+	 */
+	public int redo(Editable s){
+		s.insert(mStart,mSequence);
+		return mStart+mSequence.length();
+	}
+
+	/**
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {

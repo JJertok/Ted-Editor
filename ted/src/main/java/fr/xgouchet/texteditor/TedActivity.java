@@ -33,6 +33,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import de.neofonie.mobile.app.android.widget.crouton.Crouton;
 import de.neofonie.mobile.app.android.widget.crouton.Style;
 import fr.xgouchet.texteditor.common.Constants;
@@ -247,6 +249,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 			addMenuItem(menu, MENU_ID_UNDO, R.string.menu_undo,
 					R.drawable.ic_menu_undo);
 
+		if((!mReadOnly) && Settings.REDO)
+			addMenuItem(menu, MENU_ID_REDO, R.string.menu_redo,
+					R.drawable.ic_menu_redo);
+
 		addMenuItem(menu, MENU_ID_SEARCH, R.string.menu_search,
 				R.drawable.ic_menu_search);
 
@@ -266,6 +272,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 		if ((!mReadOnly) && Settings.UNDO)
 			showMenuItemAsAction(menu.findItem(MENU_ID_UNDO),
 					R.drawable.ic_menu_undo);
+
+		if ((!mReadOnly) && Settings.REDO)
+			showMenuItemAsAction(menu.findItem(MENU_ID_REDO),
+					R.drawable.ic_menu_redo);
+
 		showMenuItemAsAction(menu.findItem(MENU_ID_SEARCH),
 				R.drawable.ic_menu_search);
 
@@ -310,7 +321,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 				Crouton.showText(this, R.string.toast_warn_no_undo, Style.INFO);
 			}
 			return true;
+		case MENU_ID_REDO:
+			if (!redo())
+			{
+				Crouton.showText(this, R.string.toast_warn_no_redo, Style.INFO);
+			}
+			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -320,7 +338,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 	 */
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
-		if (Settings.UNDO && (!mInUndo) && (mWatcher != null))
+		if ((Settings.REDO && (!mInRedo) &&
+				Settings.UNDO && (!mInUndo))
+				&& (mWatcher != null))
 			mWatcher.beforeChange(s, start, count, after);
 	}
 
@@ -329,7 +349,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 	 *      int, int)
 	 */
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-		if (mInUndo)
+		if (mInUndo || mInRedo)
 			return;
 
 		if (Settings.UNDO && (!mInUndo) && (mWatcher != null))
@@ -564,6 +584,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 				mCurrentFileName = null;
 				mDirty = false;
 				mInUndo = false;
+				mInRedo = false;
 				mDoNotBackup = false;
 				mReadOnly = false;
 				mEditor.setEnabled(true);
@@ -657,6 +678,25 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 		mInUndo = false;
 
 		return didUndo;
+	}
+
+	/**
+	 * Redo the last change
+	 *
+	 * @return if an redo was don
+	 */
+	protected boolean redo() {
+		boolean didRedo = false;
+		mInRedo = true;
+		int caret;
+		caret = mWatcher.redo(mEditor.getText());
+		if(caret >=0) {
+			mEditor.setSelection(caret, caret);
+			didRedo = true;
+		}
+		mInRedo = false;
+
+		return didRedo;
 	}
 
 	/**
@@ -1024,6 +1064,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 	/** Undo watcher */
 	protected TextChangeWatcher mWatcher;
 	protected boolean mInUndo;
+	protected boolean mInRedo;
 	protected boolean mWarnedShouldQuit;
 	protected boolean mDoNotBackup;
 

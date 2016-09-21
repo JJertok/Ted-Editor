@@ -15,11 +15,12 @@ public class TextChangeWatcher implements Constants {
 	 */
 	public TextChangeWatcher() {
 		mChanges = new Stack<TextChange>();
+		mCancelledChanges = new Stack<TextChange>();
 	}
 
 	/**
 	 * Undo the last operation
-	 * 
+	 *
 	 * @param text
 	 *            the text to undo on
 	 * @return the caret position
@@ -34,9 +35,35 @@ public class TextChangeWatcher implements Constants {
 		}
 
 		TextChange change = mChanges.pop();
-		if (change != null)
+		if (change != null) {
+			mCancelledChanges.push(change);
 			return change.undo(text);
+		}
 		else if (BuildConfig.DEBUG)
+			Log.w(TAG, "Null change ?!");
+
+		return -1;
+	}
+
+	/**
+	 * Redo the last operation
+	 *
+	 * @param text
+	 *            the text to redo on
+	 * @return the caret position
+	 */
+	public int redo(Editable text) {
+		if (mCancelledChanges.size() == 0) {
+			if (BuildConfig.DEBUG)
+				Log.i(TAG, "Nothing to redo");
+			return -1;
+		}
+
+		TextChange cancelledChange = mCancelledChanges.pop();
+		if (cancelledChange != null) {
+			mChanges.push(cancelledChange);
+			return cancelledChange.redo(text);
+		} else if (BuildConfig.DEBUG)
 			Log.w(TAG, "Null change ?!");
 
 		return -1;
@@ -46,7 +73,7 @@ public class TextChangeWatcher implements Constants {
 	 * A change to the text {@linkplain s} will be made, where the
 	 * {@linkplain count} characters starting at {@linkplain start} will be
 	 * replaced by {@linkplain after} characters
-	 * 
+	 *
 	 * @param s
 	 *            the sequence being changed
 	 * @param start
@@ -55,7 +82,7 @@ public class TextChangeWatcher implements Constants {
 	 *            the number of characters that will change
 	 * @param after
 	 *            the number of characters that will replace the old ones
-	 * 
+	 *
 	 */
 	public void beforeChange(CharSequence s, int start, int count, int after) {
 		if ((mCurrentChange != null)
@@ -151,7 +178,9 @@ public class TextChangeWatcher implements Constants {
 		if (mCurrentChange == null)
 			return;
 
-		mChanges.push(mCurrentChange);
+		if(mChanges.size() == 0 || !mChanges.peek().equals(mCurrentChange)) {
+			mChanges.push(mCurrentChange);
+		}
 		while (mChanges.size() > Settings.UNDO_MAX_STACK) {
 			mChanges.remove(0);
 		}
@@ -173,5 +202,5 @@ public class TextChangeWatcher implements Constants {
 
 	protected TextChange mCurrentChange;
 	protected final Stack<TextChange> mChanges;
-
+	protected final Stack<TextChange> mCancelledChanges;
 }

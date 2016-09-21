@@ -43,6 +43,10 @@ public class Settings implements Constants {
 
 	/** Use Undo instead of quit ? */
 	public static boolean UNDO = true;
+
+	/** Use Redo instead of quit ? */
+	public static boolean REDO = true;
+
 	/** Undo stack capacity */
 	public static int UNDO_MAX_STACK = 25;
 	/** Use back button as undo */

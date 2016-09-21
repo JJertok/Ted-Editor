@@ -25,6 +25,7 @@
     <string name="toast_search_no_input">Escribe algo en la barra de búsqueda</string>
     <string name="toast_filename_empty">Escribe un nombre de archivo</string>
     <string name="toast_warn_no_undo">No se puede deshacer más.</string>
+    <string name="toast_warn_no_redo">No hay nada que hacer de nuevo nunca más.</string>
     <string name="toast_warn_no_undo_will_quit">No se puede deshacer más. Pulsa atrás otra vez para salir. </string>
     <string name="toast_open_home_page_error">Archivo por defecto no encontrado.</string>
     <string name="toast_home_page_cant_read">"No se puede leer el archivo por defecto"</string>

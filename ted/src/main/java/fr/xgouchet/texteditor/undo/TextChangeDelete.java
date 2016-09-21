@@ -30,6 +30,14 @@ public class TextChangeDelete implements TextChange {
 	}
 
 	/**
+	 * @see fr.xgouchet.texteditor.redo.TextChange#redo(android.text.Editable)
+	 */
+	public int redo(Editable text) {
+		text.replace(mStart,mStart+mSequence.length(),"");
+		return mStart;
+	}
+
+	/**
 	 * @see fr.xgouchet.texteditor.undo.TextChange#getCaret()
 	 */
 	public int getCaret() {
