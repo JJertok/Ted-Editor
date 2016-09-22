@@ -86,6 +86,8 @@ public class TextChangeInsert implements TextChange {
 			return false;
 
 		sub = s.subSequence(start, start + count);
+		if(sub.equals("()")||sub.equals("<>")||sub.equals("[]")||sub.equals("{}"))
+			return false;
 		append = (start == mStart + mSequence.length());
 		replace = (start == mStart) && (count >= mSequence.length())
 				&& (sub.toString().startsWith(mSequence.toString()));

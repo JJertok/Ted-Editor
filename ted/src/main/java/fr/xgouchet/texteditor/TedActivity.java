@@ -348,13 +348,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mInUndo || mInRedo)
+        if (mInUndo || mInRedo || mInBrackets)
             return;
+        boolean bracketsChanged = true;
 
         if (Settings.UNDO && (!mInUndo) && (mWatcher != null)) {
-            mWatcher.afterChange(s, start, before, count);
-            if (s.length() > beforeLength)
-                bracketsController(s, start);
+            if (s.length() > beforeLength) {
+
+                mInBrackets = true;
+                bracketsChanged = bracketsController(s, start);
+                mInBrackets = false;
+            }
+          if(!bracketsChanged)  mWatcher.afterChange(s, start, before, count);
         }
     }
 
@@ -362,41 +367,43 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @param s     Base char sequence with some of brackets at the end
      * @param start Index of first added element
      */
-    public void bracketsController(CharSequence s, int start) {
+    public boolean bracketsController(CharSequence s, int start) {
+            String secondBracket ="";
 
-        StringBuilder sb = new StringBuilder();
-        sb = sb.append(s,0,start+1);
-
-        switch (sb.charAt(start)) {
+        switch (s.charAt(start)) {
             case '(':
-                sb.append(')');
-                sb.append(s,start+1,s.length());
-                mWatcher.afterChange(sb.toString(), start, 0, 1);
-                mEditor.getText().insert(start+1,")");
-                mEditor.setSelection(start+1);
+                secondBracket=")";
                 break;
             case '{':
-                sb.append('}');
-                sb.append(s,start+1,s.length());
-                mWatcher.afterChange(sb.toString(), start, 0, 1);
-                mEditor.getText().insert(start+1,"}");
-                mEditor.setSelection(start+1);
+                secondBracket="}";
                 break;
             case '[':
-                sb.append(']');
-                sb.append(s,start+1,s.length());
-                mWatcher.afterChange(sb.toString(), start, 0, 1);
-                mEditor.getText().insert(start+1,"]");
-                mEditor.setSelection(start+1);
+                secondBracket="]";
                 break;
             case '<':
-                sb.append('>');
-                sb.append(s,start+1,s.length());
-                mWatcher.afterChange(sb.toString(), start, 0, 1);
-                mEditor.getText().insert(start+1,">");
-                mEditor.setSelection(start+1);
+                secondBracket=">";
                 break;
         }
+
+        if(secondBracket.equals("")) return false;
+        s = insertInString(s, secondBracket, start+1);
+        mWatcher.afterChange(s.toString(), start, 0, 2);
+        mEditor.getText().insert(start+1,""+secondBracket);
+        mEditor.setSelection(start+1);
+        return true;
+    }
+
+    /**
+     * @param s - string in which will insert
+     * @param insert - string, which will be inserted
+     * @param start - insert position
+     */
+    public CharSequence insertInString(CharSequence s, CharSequence insert, int start) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(s);
+        sb.insert(start,insert);
+        return sb.toString();
     }
 
     /**
@@ -408,7 +415,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             updateTitle();
         }
     }
-
     /**
      * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
      */
@@ -1128,6 +1134,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Brackets checker
      */
     protected int beforeLength;
+    protected boolean mInBrackets;
     /**
      * are we in a post activity result ?
      */
