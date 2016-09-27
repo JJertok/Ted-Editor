@@ -1058,8 +1058,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 }
             }
         };
-
-        promptSaveDirty();
+        runAfterSave();
     }
 
     /**
