@@ -1,28 +1,28 @@
 package fr.xgouchet.texteditor.syntax;
 
 public class StyleToken {
-    protected String styleName;
+    protected String token;
     protected String color;
     protected Boolean bold;
     protected Boolean italic;
 
     /**
      *
-     * @param styleName Style Token name
+     * @param token Style Token name
      * @param color Color in hex format without #
      * @param bold Flag which shows that text must be bold
      * @param italic Flag which shows that text must be italic
      */
 
-    StyleToken(String styleName, String color, Boolean bold, Boolean italic) {
-        this.styleName = styleName;
+    StyleToken(String token, String color, Boolean bold, Boolean italic) {
+        this.token = token;
         this.color = color;
         this.bold = bold;
         this.italic = italic;
     }
 
-    public String getStyleName() {
-        return styleName;
+    public String getToken() {
+        return token;
     }
 
     public String getColor() {
@@ -49,10 +49,10 @@ public class StyleToken {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SyntaxToken) {
-            return styleName.equals(((SyntaxToken) obj).styleName);
+            return token.equals(((SyntaxToken) obj).styleName);
         }
         return obj instanceof StyleToken &&
-                styleName.equals(((StyleToken) obj).styleName) &&
+                token.equals(((StyleToken) obj).token) &&
                 color.equals(((StyleToken) obj).color) &&
                 bold.equals(((StyleToken) obj).bold) &&
                 italic.equals(((StyleToken) obj).italic);

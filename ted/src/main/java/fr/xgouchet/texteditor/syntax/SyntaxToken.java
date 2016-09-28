@@ -2,21 +2,21 @@ package fr.xgouchet.texteditor.syntax;
 
 
 public class SyntaxToken {
-    protected String word;
+    protected String token;
     protected String styleName;
 
     /**
      *
-     * @param word Syntax item
+     * @param token Syntax item
      * @param styleName Style name for this token
      */
-    SyntaxToken(String word, String styleName) {
-        this.word = word;
+    SyntaxToken(String token, String styleName) {
+        this.token = token;
         this.styleName = styleName;
     }
 
-    public String getWord() {
-        return word;
+    public String getToken() {
+        return token;
     }
 
     public String getStyleName() {
@@ -36,10 +36,10 @@ public class SyntaxToken {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StyleToken ) {
-            return styleName.equals(((StyleToken) obj).styleName);
+            return styleName.equals(((StyleToken) obj).token);
         }
         return obj instanceof SyntaxToken &&
-                word.equals(((SyntaxToken) obj).word)&&
+                token.equals(((SyntaxToken) obj).token)&&
                 styleName.equals(((SyntaxToken) obj).styleName);
     }
 }
