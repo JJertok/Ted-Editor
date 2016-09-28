@@ -13,7 +13,7 @@ public class Hightlighter {
      * @param st Collection of syntax tokens
      * @param tt Collection of type tokens
      */
-    Hightlighter(ArrayList<SyntaxToken> st, ArrayList<StyleToken> tt) {
+    public Hightlighter(ArrayList<SyntaxToken> st, ArrayList<StyleToken> tt) {
        syntaxTokens = st;
         styleTokens = tt;
     }

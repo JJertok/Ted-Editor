@@ -8,6 +8,7 @@ import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemAsAction;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -35,6 +36,8 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.xmlpull.v1.XmlPullParserException;
+
 import de.neofonie.mobile.app.android.widget.crouton.Crouton;
 import de.neofonie.mobile.app.android.widget.crouton.Style;
 import fr.xgouchet.texteditor.common.Constants;
@@ -42,6 +45,8 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
+import fr.xgouchet.texteditor.syntax.Hightlighter;
+import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
@@ -60,7 +65,17 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         Settings.updateFromPreferences(getSharedPreferences(PREFERENCES_NAME,
                 MODE_PRIVATE));
-
+        TokenReader tokenReader = new TokenReader();
+        Hightlighter hg;
+        try {
+         hg = new Hightlighter(tokenReader.readSyntaxTokens(
+                 getResources().openRawResource(R.raw.syntax_tokens)),
+                 tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens)));
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //
         mReadIntent = true;
 

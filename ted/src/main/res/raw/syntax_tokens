@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SyntaxTokens>
+    <cppTokens>
+        <token styleToken="KEYWORD" token="alignas" />
+        <token styleToken="KEYWORD" token="class" />
+        <token styleToken="VARTYPE" token="int"/>
+    </cppTokens>
+    <goTokens></goTokens>
+    <htmlTokens></htmlTokens>
+</SyntaxTokens>
