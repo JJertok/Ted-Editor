@@ -66,9 +66,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         Settings.updateFromPreferences(getSharedPreferences(PREFERENCES_NAME,
                 MODE_PRIVATE));
         TokenReader tokenReader = new TokenReader();
-        Hightlighter hg;
         try {
-         hg = new Hightlighter(tokenReader.readSyntaxTokens(
+            highlighter = new Hightlighter(tokenReader.readSyntaxTokens(
                  getResources().openRawResource(R.raw.syntax_tokens)),
                  tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens)));
         } catch (XmlPullParserException e) {
@@ -425,6 +424,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
      */
     public void afterTextChanged(Editable s) {
+        highlighter.hightlight(s);
+
         if (!mDirty) {
             mDirty = true;
             updateTitle();
@@ -1144,6 +1145,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected boolean mInRedo;
     protected boolean mWarnedShouldQuit;
     protected boolean mDoNotBackup;
+
+    /**
+     * Highlighter
+     */
+    protected Hightlighter highlighter;
+
     /**
      * Brackets checker
      */
