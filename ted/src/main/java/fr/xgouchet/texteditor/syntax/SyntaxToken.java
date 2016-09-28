@@ -3,24 +3,24 @@ package fr.xgouchet.texteditor.syntax;
 
 public class SyntaxToken {
     protected String token;
-    protected String styleName;
+    protected String styleToken;
 
     /**
      *
      * @param token Syntax item
-     * @param styleName Style name for this token
+     * @param styleToken Style token for this token
      */
-    SyntaxToken(String token, String styleName) {
+    SyntaxToken(String token, String styleToken) {
         this.token = token;
-        this.styleName = styleName;
+        this.styleToken = styleToken;
     }
 
     public String getToken() {
         return token;
     }
 
-    public String getStyleName() {
-        return styleName;
+    public String getStyleToken() {
+        return styleToken;
     }
 
     /**
@@ -36,10 +36,10 @@ public class SyntaxToken {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StyleToken ) {
-            return styleName.equals(((StyleToken) obj).token);
+            return styleToken.equals(((StyleToken) obj).token);
         }
         return obj instanceof SyntaxToken &&
                 token.equals(((SyntaxToken) obj).token)&&
-                styleName.equals(((SyntaxToken) obj).styleName);
+                styleToken.equals(((SyntaxToken) obj).styleToken);
     }
 }

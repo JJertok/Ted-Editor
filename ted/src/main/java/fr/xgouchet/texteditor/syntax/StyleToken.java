@@ -49,7 +49,7 @@ public class StyleToken {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SyntaxToken) {
-            return token.equals(((SyntaxToken) obj).styleName);
+            return token.equals(((SyntaxToken) obj).styleToken);
         }
         return obj instanceof StyleToken &&
                 token.equals(((StyleToken) obj).token) &&
