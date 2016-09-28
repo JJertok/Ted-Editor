@@ -2,6 +2,7 @@
 <StyleTokens>
     <classicStyle>
         <style bold="false" color="#0000FF" italic="false" token="KEYWORD" />
-        <style bold="false" color="#FF00FF" italic="false" token="VARTYPE" />
+        <style bold="false" color="#0000FF" italic="false" token="VARIABLE_TYPE" />
+        <style bold="false" color="#808080" italic="false" token="PREPROCESSOR"/>
     </classicStyle>
 </StyleTokens>
