@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Hightlighter {
 
     protected ArrayList<SyntaxToken> syntaxTokens;
-    protected ArrayList<TypeToken> typeTokens;
+    protected ArrayList<StyleToken> styleTokens;
 
 
     /**
@@ -13,9 +13,9 @@ public class Hightlighter {
      * @param st Collection of syntax tokens
      * @param tt Collection of type tokens
      */
-    Hightlighter(ArrayList<SyntaxToken> st, ArrayList<TypeToken> tt) {
+    Hightlighter(ArrayList<SyntaxToken> st, ArrayList<StyleToken> tt) {
        syntaxTokens = st;
-        typeTokens = tt;
+        styleTokens = tt;
     }
 
     /**
@@ -46,9 +46,9 @@ public class Hightlighter {
 
     /**
      *
-     * @param typeTokens Collection of type tokens
+     * @param styleTokens Collection of type tokens
      */
-    public void setTypeTokens(ArrayList<TypeToken> typeTokens) {
-        this.typeTokens = typeTokens;
+    public void setStyleTokens(ArrayList<StyleToken> styleTokens) {
+        this.styleTokens = styleTokens;
     }
 }

@@ -21,6 +21,22 @@ public class StyleToken {
         this.italic = italic;
     }
 
+    public String getStyleName() {
+        return styleName;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public Boolean getBold() {
+        return bold;
+    }
+
+    public Boolean getItalic() {
+        return italic;
+    }
+
     /**
      * Operation have two paths one for comparing with Syntax Token
      * for checking style names of Syntax Tokens.
@@ -28,6 +44,8 @@ public class StyleToken {
      * @param obj Object with which we compare current class
      * @return Result of comparison operation
      */
+
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SyntaxToken) {

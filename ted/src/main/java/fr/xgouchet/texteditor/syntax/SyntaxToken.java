@@ -15,6 +15,14 @@ public class SyntaxToken {
         this.styleName = styleName;
     }
 
+    public String getWord() {
+        return word;
+    }
+
+    public String getStyleName() {
+        return styleName;
+    }
+
     /**
      * Operation have two paths one for comparing Syntax Tokens
      * Other one for compering Style Tokens names
@@ -22,6 +30,9 @@ public class SyntaxToken {
      * @return Result of comparison operation
      *
      */
+
+
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof StyleToken ) {
