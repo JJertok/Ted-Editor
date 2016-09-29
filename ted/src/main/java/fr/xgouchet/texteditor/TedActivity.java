@@ -34,7 +34,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -45,7 +44,7 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
-import fr.xgouchet.texteditor.syntax.Hightlighter;
+import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
@@ -68,7 +67,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         mReadIntent = true;
 
-        highlighter = new Hightlighter();
+        highlighter = new Highlighter();
         tokenReader = new TokenReader();
 
         initHighlighter();
@@ -435,7 +434,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void afterTextChanged(Editable s) {
         if(Settings.HIGHLIGHT_SYNTAX) {
             updateHightlightSettings();
-            highlighter.hightlight(s);
+            highlighter.highlight(s);
         } else {
             highlighter.clear(s);
         }
@@ -1174,7 +1173,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     /**
      * Highlighter
      */
-    protected Hightlighter highlighter;
+    protected Highlighter highlighter;
     protected TokenReader tokenReader;
 
     /**
@@ -1192,7 +1191,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         Editable s  = mEditor.getEditableText();
         if(Settings.HIGHLIGHT_SYNTAX) {
             updateHightlightSettings();
-            highlighter.hightlight(s);
+            highlighter.highlight(s);
         } else {
             highlighter.clear(s);
         }
