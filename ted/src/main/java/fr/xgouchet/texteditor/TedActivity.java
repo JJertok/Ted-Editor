@@ -47,11 +47,12 @@ import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
 import fr.xgouchet.texteditor.syntax.Hightlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
+import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
-        OnClickListener {
+        OnClickListener, UpdateSettingListener {
 
     /**
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -73,7 +74,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         initHighlighter();
         // editor
         mEditor = (AdvancedEditText) findViewById(R.id.editor);
+
         mEditor.addTextChangedListener(this);
+        mEditor.addUpdateSetting(this);
         mEditor.updateFromSettings();
         mWatcher = new TextChangeWatcher();
         mWarnedShouldQuit = false;
@@ -97,6 +100,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             e.printStackTrace();
         }
     }
+
+
 
     /**
      * @see android.app.Activity#onStart()
@@ -1182,4 +1187,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected boolean mReadIntent;
 
+    @Override
+    public void updateSetting() {
+        Editable s  = mEditor.getEditableText();
+        if(Settings.HIGHLIGHT_SYNTAX) {
+            updateHightlightSettings();
+            highlighter.hightlight(s);
+        } else {
+            highlighter.clear(s);
+        }
+    }
 }
