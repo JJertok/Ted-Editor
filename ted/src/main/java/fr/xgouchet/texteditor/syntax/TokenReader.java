@@ -11,8 +11,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 public class TokenReader {
     private static final String ns = null;
-    //private static final String syntaxBlock = "cppTokens";
-    //private static final String styleBlock = "classicStyle";
 
     /**
      * @param in Input Stream with xml data
