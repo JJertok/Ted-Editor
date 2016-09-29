@@ -446,9 +446,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     int previousHighlightScheme = 0;
+    int previousLanguage = 0;
     private void updateHightlightSettings() {
-        if(previousHighlightScheme != Settings.COLOR_SCHEME) {
+        if(previousHighlightScheme != Settings.COLOR_SCHEME || previousLanguage != Settings.LANGUAGE) {
             previousHighlightScheme = Settings.COLOR_SCHEME;
+            previousLanguage = Settings.LANGUAGE;
             initHighlighter();
         }
     }
