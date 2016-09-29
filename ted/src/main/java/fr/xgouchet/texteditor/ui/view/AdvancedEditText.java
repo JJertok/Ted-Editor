@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
@@ -17,9 +18,13 @@ import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
+
+import java.util.LinkedList;
+
 import fr.xgouchet.texteditor.R;
 import fr.xgouchet.texteditor.common.Constants;
 import fr.xgouchet.texteditor.common.Settings;
+import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 
 /**
  * TODO create a syntax highlighter
@@ -54,6 +59,14 @@ public class AdvancedEditText extends EditText implements Constants,
 		mGestureDetector = new GestureDetector(getContext(), this);
 
 		updateFromSettings();
+
+	}
+
+
+	LinkedList<UpdateSettingListener> listeners = new LinkedList<UpdateSettingListener>();;
+
+	public void addUpdateSetting(UpdateSettingListener listener) {
+		listeners.add(listener);
 	}
 
 	/**
@@ -164,6 +177,9 @@ public class AdvancedEditText extends EditText implements Constants,
 		return true;
 	}
 
+
+
+
 	/**
 	 * @see android.view.GestureDetector.OnGestureListener#onDown(android.view.MotionEvent)
 	 * @category GestureDetection
@@ -232,6 +248,10 @@ public class AdvancedEditText extends EditText implements Constants,
 	 * @category Custom
 	 */
 	public void updateFromSettings() {
+		for (UpdateSettingListener listener:
+				listeners) {
+			listener.updateSetting();
+		}
 
 		if (isInEditMode()) {
 			return;
@@ -306,6 +326,9 @@ public class AdvancedEditText extends EditText implements Constants,
 		} else {
 			setPadding(mPadding, mPadding, mPadding, mPadding);
 		}
+
+
+
 	}
 
 	/**
