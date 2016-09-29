@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Hightlighter {
+public class Highlighter {
 
     protected ArrayList<SyntaxToken> syntaxTokens;
     protected ArrayList<StyleToken> styleTokens;
@@ -21,11 +21,10 @@ public class Hightlighter {
     protected Pattern pattern;
 
     /**
-     *
      * @param st Collection of syntax tokens
      * @param tt Collection of type tokens
      */
-    public Hightlighter(ArrayList<SyntaxToken> st, ArrayList<StyleToken> tt) {
+    public Highlighter(ArrayList<SyntaxToken> st, ArrayList<StyleToken> tt) {
         syntaxTokens = st;
         styleTokens = tt;
         mSpans = new ArrayList<Object>();
@@ -33,7 +32,7 @@ public class Hightlighter {
         buildPattern();
     }
 
-    public Hightlighter() {
+    public Highlighter() {
         mSpans = new ArrayList<Object>();
     }
 
@@ -42,7 +41,7 @@ public class Hightlighter {
      * Clear all styles
      */
     public void clear(Editable s) {
-        for (Object span:
+        for (Object span :
                 mSpans) {
             s.removeSpan(span);
         }
@@ -50,17 +49,16 @@ public class Hightlighter {
     }
 
     /**
-     *
      * @param s String which must be checked for highlighting
      */
-    public void hightlight(Editable s) {
-        if(mSpans == null || mStyles == null || pattern == null) return;
+    public void highlight(Editable s) {
+        if (mSpans == null || mStyles == null || pattern == null) return;
 
         clear(s);
 
         Matcher matcher = pattern.matcher(s.toString());
 
-        while(matcher.find()) {
+        while (matcher.find()) {
             Object span = getSpan(matcher.group());
             mSpans.add(span);
             s.setSpan(
@@ -71,9 +69,9 @@ public class Hightlighter {
         }
     }
 
-    
+
     private ForegroundColorSpan getSpan(String token) {
-        if(!mStyles.containsKey(token)) return null;
+        if (!mStyles.containsKey(token)) return null;
 
         StyleToken result = mStyles.get(token);
         return new ForegroundColorSpan(Color.parseColor(result.getColor()));
@@ -81,17 +79,15 @@ public class Hightlighter {
 
 
     /**
-     *
-     * @param s String which must be checked for highlighting
+     * @param s     String which must be checked for highlighting
      * @param start Start of substring for checking
-     * @param end End of substring for checking
+     * @param end   End of substring for checking
      */
-    public void hightlight(CharSequence s, int start, int end) {
+    public void highlight(CharSequence s, int start, int end) {
 
     }
 
     /**
-     *
      * @param syntaxTokens Collection of syntax tokens
      */
     public void setSyntaxTokens(ArrayList<SyntaxToken> syntaxTokens) {
@@ -101,7 +97,6 @@ public class Hightlighter {
     }
 
     /**
-     *
      * @param styleTokens Collection of type tokens
      */
     public void setStyleTokens(ArrayList<StyleToken> styleTokens) {
@@ -112,19 +107,19 @@ public class Hightlighter {
 
 
     /**
-     *  build hash map to get faster styletoken by token name
+     * build hash map to get faster style token by token name
      */
     private void buildMapTokenStyle() {
-        if(syntaxTokens == null || styleTokens == null) return;
+        if (syntaxTokens == null || styleTokens == null) return;
 
         mStyles = new HashMap<String, StyleToken>();
 
-        for (SyntaxToken token:
+        for (SyntaxToken token :
                 syntaxTokens) {
 
-            for (StyleToken style:
+            for (StyleToken style :
                     styleTokens) {
-                if(style.equals(token)) {
+                if (style.equals(token)) {
                     mStyles.put(token.getToken(), style);
                     break;
                 }
@@ -134,17 +129,21 @@ public class Hightlighter {
 
 
     /**
-     *  pre build regex pattern to match all tokens
+     * pre build regex pattern to match all tokens
      */
     private void buildPattern() {
-        if(syntaxTokens == null) return;
+        if (syntaxTokens == null) return;
         // build pattern to match all tokens
         StringBuilder patternBuilder = new StringBuilder();
-        for (SyntaxToken token:
+        String tok = "";
+        for (SyntaxToken token :
                 syntaxTokens) {
-            patternBuilder.append("(\\b" + token.getToken() + "\\b)");
-            if(!token.equals(syntaxTokens.get(syntaxTokens.size() - 1))) {
-                patternBuilder.append( "|");
+          if(token.getToken().charAt(0)=='#')
+              patternBuilder.append("(\\" + token.getToken() + ")");
+          else  patternBuilder.append("(\\b" + token.getToken() + "\\b)");
+
+            if (!token.equals(syntaxTokens.get(syntaxTokens.size() - 1))) {
+                patternBuilder.append("|");
             }
         }
 

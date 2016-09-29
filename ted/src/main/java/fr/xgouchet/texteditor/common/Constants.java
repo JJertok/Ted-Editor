@@ -82,7 +82,7 @@ public interface Constants {
 	public static final String PREFERENCE_AUTO_SAVE_OVERWRITE = "auto_save_overwrite";
 	/** Preference tag to retrieve the Color Theme ( = {@value} ) */
 	public static final String PREFERENCE_COLOR_THEME = "color_theme";
-	/** Preference tag to retrieve the hightlight Theme ( = {@value} ) */
+	/** Preference tag to retrieve the highlight Theme ( = {@value} ) */
 	public static final String PREFERENCE_HIGHTLIGHT_THEME = "highlight_theme";
 	/** Preference tag to retrieve the language( = {@value} ) */
 	public static final String PREFERENCE_LANGUAGE = "language";
