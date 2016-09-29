@@ -24,9 +24,11 @@
     <string name="config_cat_misc">Divers</string>
     <string name="config_title_font">Changer la police</string>
     <string name="config_title_line_numbers">Afficher les numéros de ligne</string>
+    <string name="config_title_highlight_syntax">syntaxe Highlight</string>
     <string name="config_title_word_wrap">Coupure de lignes automatique</string>
     <string name="config_title_text_size">Taille du texte</string>
     <string name="config_title_color_theme">Thèmes de couleurs</string>
+    <string name="config_title_hightlight_theme">thème Highlight</string>
     <string name="config_title_end_of_lines">Fin de lignes</string>
     <string name="config_title_max_recent">Fichiers récents</string>
     <string name="config_title_search_wrap">Recherche en boucle</string>
@@ -41,6 +43,7 @@
     <string name="config_title_auto_save_overwrite">Ecraser les fichiers existants</string>
     <string name="config_summary_auto_save">"Sauvegarde automatique du fichier en cours lorsque l'application passe en arrière plan"</string>
     <string name="config_summary_line_numbers">Les numéros de lignes sont affichés en début de ligne</string>
+    <string name="config_hightlight_syntax">Activer la coloration syntaxique</string>
     <string name="config_summary_word_wrap">"Les lignes trop longues sont ajustées à la taille de l'écran"</string>
     <string name="config_summary_scroll_fling">"Décocher l'option en cas de problèmes de performances"</string>
     <string name="config_summary_use_home_page">Selectionner un fichier à ouvrir au démarrage de Ted</string>

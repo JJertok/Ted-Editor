@@ -62,22 +62,15 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             Log.d(TAG, "onCreate");
 
         setContentView(R.layout.layout_editor);
-
         Settings.updateFromPreferences(getSharedPreferences(PREFERENCES_NAME,
                 MODE_PRIVATE));
-        TokenReader tokenReader = new TokenReader();
-        try {
-            highlighter = new Hightlighter(tokenReader.readSyntaxTokens(
-                 getResources().openRawResource(R.raw.syntax_tokens)),
-                 tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens)));
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //
+
         mReadIntent = true;
 
+        highlighter = new Hightlighter();
+        tokenReader = new TokenReader();
+
+        initHighlighter();
         // editor
         mEditor = (AdvancedEditText) findViewById(R.id.editor);
         mEditor.addTextChangedListener(this);
@@ -92,6 +85,17 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         findViewById(R.id.buttonSearchClose).setOnClickListener(this);
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
         findViewById(R.id.buttonSearchPrev).setOnClickListener(this);
+    }
+
+    protected void initHighlighter() {
+        try {
+            highlighter.setSyntaxTokens(tokenReader.readSyntaxTokens(getResources().openRawResource(R.raw.syntax_tokens), "cppTokens"));
+            highlighter.setStyleTokens(tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens), Settings.getColorSchemeName(0)));
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -424,13 +428,27 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
      */
     public void afterTextChanged(Editable s) {
-        highlighter.hightlight(s);
+        if(Settings.HIGHLIGHT_SYNTAX) {
+            updateHightlightSettings();
+            highlighter.hightlight(s);
+        } else {
+            highlighter.clear(s);
+        }
 
         if (!mDirty) {
             mDirty = true;
             updateTitle();
         }
     }
+
+    int previousHighlightScheme = 0;
+    private void updateHightlightSettings() {
+        if(previousHighlightScheme != Settings.COLOR_SCHEME) {
+            previousHighlightScheme = Settings.COLOR_SCHEME;
+            initHighlighter();
+        }
+    }
+
     /**
      * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
      */
@@ -817,6 +835,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Runs the after save to complete
      */
     protected void runAfterSave() {
+
+
         if (mAfterSave == null) {
             if (BuildConfig.DEBUG)
                 Log.d(TAG, "No After shave, ignoring...");
@@ -1150,6 +1170,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Highlighter
      */
     protected Hightlighter highlighter;
+    protected TokenReader tokenReader;
 
     /**
      * Brackets checker

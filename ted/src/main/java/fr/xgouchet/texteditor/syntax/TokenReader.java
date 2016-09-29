@@ -11,8 +11,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 public class TokenReader {
     private static final String ns = null;
-    private static final String syntaxBlock = "cppTokens";
-    private static final String styleBlock = "classicStyle";
+    //private static final String syntaxBlock = "cppTokens";
+    //private static final String styleBlock = "classicStyle";
 
     /**
      * @param in Input Stream with xml data
@@ -73,7 +73,7 @@ public class TokenReader {
      * @param in Input Stream, which contains Syntax Tokens of some programming language in xml format.
      * @return Collection of Syntax Tokens
      */
-    public ArrayList<SyntaxToken> readSyntaxTokens(InputStream in) throws XmlPullParserException, IOException {
+    public ArrayList<SyntaxToken> readSyntaxTokens(InputStream in, String syntaxBlock) throws XmlPullParserException, IOException {
 
         ArrayList<SyntaxToken> syntaxTokens = new ArrayList<SyntaxToken>();
         XmlPullParser parser = createParser(in);
@@ -119,7 +119,7 @@ public class TokenReader {
      *           style(name) and color of highlighting.
      * @return Collection of Style Tokens
      */
-    public ArrayList<StyleToken> readStyleTokens(InputStream in) throws IOException, XmlPullParserException {
+    public ArrayList<StyleToken> readStyleTokens(InputStream in, String styleBlock) throws IOException, XmlPullParserException {
 
         ArrayList<StyleToken> styleTokens = new ArrayList<StyleToken>();
         XmlPullParser parser = createParser(in);

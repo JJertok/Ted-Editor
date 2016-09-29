@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import org.mozilla.universalchardet.Constants;
 import org.mozilla.universalchardet.UniversalDetector;
 
 import android.content.Context;
@@ -71,7 +72,10 @@ public final class TextFileUtils {
 			detector.dataEnd();
 
 			encoding = detector.getDetectedCharset();
-
+			if(encoding == null)
+			{
+				encoding = Constants.CHARSET_UTF_8;
+			}
 			detector.reset();
 			input.close();
 		} catch (IOException e) {

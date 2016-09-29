@@ -59,6 +59,9 @@ public interface Constants {
 	public static final String PREFERENCE_MAX_RECENTS = "max_recent_files";
 	/** Preference tag to retrieve the show line number ( = {@value} ) */
 	public static final String PREFERENCE_SHOW_LINE_NUMBERS = "show_line_numbers";
+	/** Preference tag to retrieve the highlight syntax ( = {@value} ) */
+	public static final String PREFERENCE_HIGHLIGHT_SYNTAX = "hightlight_syntax";
+
 	/** Preference tag to retrieve the wordwrap ( = {@value} ) */
 	public static final String PREFERENCE_WORDWRAP = "auto_break_lines";
 	/** Preference tag to retrieve the searchwrap ( = {@value} ) */
@@ -79,6 +82,8 @@ public interface Constants {
 	public static final String PREFERENCE_AUTO_SAVE_OVERWRITE = "auto_save_overwrite";
 	/** Preference tag to retrieve the Color Theme ( = {@value} ) */
 	public static final String PREFERENCE_COLOR_THEME = "color_theme";
+	/** Preference tag to retrieve the hightlight Theme ( = {@value} ) */
+	public static final String PREFERENCE_HIGHTLIGHT_THEME = "highlight_theme";
 	/** Preference tag to retrieve the fling to scroll ( = {@value} ) */
 	public static final String PREFERENCE_FLING_TO_SCROLL = "fling_to_scroll";
 	/** Preference tag to retrieve if undo history is allowed ( = {@value} ) */
@@ -117,6 +122,9 @@ public interface Constants {
 
 	/** color theme default : black on white ( = {@value} ) */
 	public static final int COLOR_CLASSIC = 0;
+	/** color theme default : black on white ( = {@value} ) */
+	public static final int COLOR_SCHEME_CLASSIC = 0;
+
 	/** color theme negative : white on black ( = {@value} ) */
 	public static final int COLOR_NEGATIVE = 1;
 	/** color theme matrix : green on dark green ( = {@value} ) */

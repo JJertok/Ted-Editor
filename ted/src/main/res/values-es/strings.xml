@@ -25,10 +25,12 @@
     <string name="config_cat_search">Búsqueda</string>
     <string name="config_cat_misc">Configuración avanzada</string>
     <string name="config_title_line_numbers">Mostrar números en cada línea</string>
+    <string name="config_title_highlight_syntax">Resaltar la sintaxisx</string>
     <string name="config_title_word_wrap">Agrupar líneas</string>
     <string name="config_title_font">Cambiar fuente del texto</string>
     <string name="config_title_text_size">Tamaño del texto</string>
     <string name="config_title_color_theme">Tema de la interfaz</string>
+    <string name="config_title_hightlight_theme">El tema más destacado</string>
     <string name="config_title_end_of_lines">Retorno de carro</string>
     <string name="config_title_max_recent">Máximo número de archivos recientes</string>
     <string name="config_title_search_wrap">Buscar en todo el documento</string>
@@ -43,6 +45,7 @@
     <string name="config_title_auto_save_overwrite">Sobreescribir archivos existentes</string>
     <string name="config_summary_auto_save">Salva automáticamente si la aplicación pasa a segundo plano</string>
     <string name="config_summary_line_numbers">Se muestran los números de cada línea a la izquierda de la página</string>
+    <string name="config_hightlight_syntax">Habilitar la sintaxis más destacado</string>
     <string name="config_summary_word_wrap">Las líneas se ajustarán para que quepan en la pantalla</string>
     <string name="config_summary_scroll_fling">Desmarcar si se experimentan problemas de rendimiento</string>
     <string name="config_summary_use_home_page">Selecciona un archivo para abrir cada vez que se ejecute Ted</string>

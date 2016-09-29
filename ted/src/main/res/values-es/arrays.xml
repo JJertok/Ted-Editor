@@ -17,6 +17,18 @@
         <item>4</item>
     </string-array>
 
+
+    <!-- Highlight themes -->
+    <string-array name="color_highlight_names">
+        <item>Defaut</item>
+        <item>Demo</item>
+    </string-array>
+    <string-array name="color_highlight_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
     <!-- Text size -->
     <string-array name="text_size_names">
         <item>6 pt</item>

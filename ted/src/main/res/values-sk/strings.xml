@@ -25,10 +25,12 @@
     <string name="config_cat_search">Hľadať</string>
     <string name="config_cat_misc">Rôzne</string>
     <string name="config_title_line_numbers">Zobraziť čísla riadkov</string>
+    <string name="config_title_highlight_syntax">vrhunec sintaksa</string>
     <string name="config_title_word_wrap">Zalomiť text</string>
     <string name="config_title_font">Zmeniť písmo textu</string>
     <string name="config_title_text_size">Veľkosť písma</string>
     <string name="config_title_color_theme">Farebná téma</string>
+    <string name="config_title_hightlight_theme">Prioritetna tema</string>
     <string name="config_title_end_of_lines">Koniec riadkov</string>
     <string name="config_title_max_recent">Maximálny počet nedávnych súborov</string>
     <string name="config_title_search_wrap">Zalomiť hľadanie</string>
@@ -43,6 +45,7 @@
     <string name="config_title_auto_save_overwrite">Prepísať existujúce súbory</string>
     <string name="config_summary_auto_save">Automaticky uložiť editovaný súbor, keď je aplikácia prepnutá do pozadia</string>
     <string name="config_summary_line_numbers">Zobraziť číslo riadku v ľavej časti stránky</string>
+    <string name="config_hightlight_syntax">Omogoči označite sintakse</string>
     <string name="config_summary_word_wrap">Riadky sa rozdelia do nových riadkov, ak sú príliš široké na obrazovke</string>
     <string name="config_summary_scroll_fling">Zakážte, ak máte problémy s výkonom</string>
     <string name="config_summary_use_home_page">Vybrať súbor, ktorý chcete otvoriť pri spustení Teda z domovskej obrazovky</string>

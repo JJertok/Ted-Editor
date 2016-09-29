@@ -70,8 +70,8 @@ public class TextFileUtils implements Constants {
 		StringBuffer text = new StringBuffer();
 		int c;
 		try {
-			reader = new InputStreamReader(new FileInputStream(file),
-					detectCharSet(file.getAbsolutePath()));
+			String charset = fr.xgouchet.androidlib.data.TextFileUtils.getFileEncoding(file);
+			reader = new InputStreamReader(new FileInputStream(file), charset);
 			in = new BufferedReader(reader);
 			do {
 				c = in.read();
@@ -182,7 +182,6 @@ public class TextFileUtils implements Constants {
 	public static String detectCharSet(String fileName) throws IOException {
 	    byte[] buf = new byte[4096];
 	    FileInputStream fis = new FileInputStream(fileName);
-
 	    UniversalDetector detector = new UniversalDetector(null);
 
 	    int nread;

@@ -14,10 +14,14 @@ public class Settings implements Constants {
 
 	/** Show the lines numbers */
 	public static boolean SHOW_LINE_NUMBERS = true;
+	/** Highlight syntax */
+	public static boolean HIGHLIGHT_SYNTAX = true;
 	/** automatic break line to fit one page */
 	public static boolean WORDWRAP = false;
 	/** color setting */
 	public static int COLOR = COLOR_CLASSIC;
+	/** color schem setting */
+	public static int COLOR_SCHEME = COLOR_SCHEME_CLASSIC;
 
 	/** when search reaches the end of a file, search wrap */
 	public static boolean SEARCHWRAP = false;
@@ -44,7 +48,7 @@ public class Settings implements Constants {
 	/** Use Undo instead of quit ? */
 	public static boolean UNDO = true;
 
-	/** Use Redo instead of quit ? */
+	/** Use Redo ? */
 	public static boolean REDO = true;
 
 	/** Undo stack capacity */
@@ -84,6 +88,7 @@ public class Settings implements Constants {
 				PREFERENCE_MAX_RECENTS, "10");
 		SHOW_LINE_NUMBERS = settings.getBoolean(PREFERENCE_SHOW_LINE_NUMBERS,
 				true);
+		HIGHLIGHT_SYNTAX = settings.getBoolean(PREFERENCE_HIGHLIGHT_SYNTAX, true);
 		WORDWRAP = settings.getBoolean(PREFERENCE_WORDWRAP, false);
 		TEXT_SIZE = getStringPreferenceAsInteger(settings,
 				PREFERENCE_TEXT_SIZE, "12");
@@ -94,6 +99,9 @@ public class Settings implements Constants {
 				PREFERENCE_AUTO_SAVE_OVERWRITE, false);
 		COLOR = getStringPreferenceAsInteger(settings, PREFERENCE_COLOR_THEME,
 				("" + COLOR_CLASSIC));
+		COLOR_SCHEME = getStringPreferenceAsInteger(settings, PREFERENCE_HIGHTLIGHT_THEME,
+				("" + COLOR_SCHEME_CLASSIC));
+
 		SEARCHWRAP = settings.getBoolean(PREFERENCE_SEARCHWRAP, false);
 		SEARCHMATCHCASE = settings.getBoolean(PREFERENCE_SEARCH_MATCH_CASE,
 				false);
@@ -169,5 +177,10 @@ public class Settings implements Constants {
 			res = Typeface.createFromFile(getFontFile(ctx));
 		}
 		return res;
+	}
+
+	public static String getColorSchemeName(int color_scheme_index) {
+		String[] schemes = new String[] { "classicStyle", "demoStyle" };
+		return  schemes[color_scheme_index];
 	}
 }

@@ -9,7 +9,13 @@
         <item>Ciel Bleu</item>
         <item>Dracula</item>
     </string-array>
-    
+
+
+    <!-- Highlight themes -->
+    <string-array name="color_highlight_names">
+        <item>Defaut</item>
+        <item>Demo</item>
+    </string-array>
     
 
 </resources>

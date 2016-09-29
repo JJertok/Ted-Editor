@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <StyleTokens>
     <classicStyle>
-        <style bold="false" color="#0000FF" italic="false" token="KEYWORD" />
-        <style bold="false" color="#FF00FF" italic="false" token="VARTYPE" />
-    </classicStyle>
+            <style bold="false" color="#0000FF" italic="false" token="KEYWORD" />
+            <style bold="false" color="#FF00FF" italic="false" token="VARTYPE" />
+        </classicStyle>
+    <demoStyle>
+        <style bold="false" color="#00FFFF" italic="false" token="KEYWORD" />
+        <style bold="false" color="#FF0000" italic="false" token="VARTYPE" />
+    </demoStyle>
 </StyleTokens>

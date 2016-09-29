@@ -25,10 +25,12 @@
     <string name="config_cat_search">Search</string>
     <string name="config_cat_misc">Miscellaneous</string>
     <string name="config_title_line_numbers">Show line numbers</string>
+    <string name="config_title_highlight_syntax">Highlight syntax</string>
     <string name="config_title_word_wrap">Word wrap</string>
     <string name="config_title_font">Change text font</string>
     <string name="config_title_text_size">Text size</string>
     <string name="config_title_color_theme">Color theme</string>
+    <string name="config_title_highlight_theme">Highlight theme</string>
     <string name="config_title_end_of_lines">End of lines</string>
     <string name="config_title_max_recent">Maximum recent files</string>
     <string name="config_title_search_wrap">Search wrap</string>
@@ -43,6 +45,7 @@
     <string name="config_title_auto_save_overwrite">Overwrite existing files</string>
     <string name="config_summary_auto_save">Automatically saves the file being edited when the app goes in background</string>
     <string name="config_summary_line_numbers">Display the line number at the left of the page</string>
+    <string name="config_hightlight_syntax">Enable highlight syntax</string>
     <string name="config_summary_word_wrap">Lines will break in new lines if they are too wide for the screen</string>
     <string name="config_summary_scroll_fling">Uncheck if you have performance issues</string>
     <string name="config_summary_use_home_page">Select a file to open when you launch Ted from your home screen</string>

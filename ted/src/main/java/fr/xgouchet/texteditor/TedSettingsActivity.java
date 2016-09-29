@@ -153,6 +153,9 @@ public class TedSettingsActivity extends PreferenceActivity implements
 		listPref = (ListPreference) findPreference(PREFERENCE_COLOR_THEME);
 		listPref.setSummary(listPref.getEntry());
 
+		listPref = (ListPreference) findPreference(PREFERENCE_HIGHTLIGHT_THEME);
+		listPref.setSummary(listPref.getEntry());
+
 		listPref = (ListPreference) findPreference(PREFERENCE_TEXT_SIZE);
 		listPref.setSummary(listPref.getEntry());
 

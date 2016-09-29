@@ -10,6 +10,19 @@
             android:summaryOn="@string/config_summary_line_numbers"
             android:title="@string/config_title_line_numbers" />
         <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="hightlight_syntax"
+            android:summaryOn="@string/config_hightlight_syntax"
+            android:title="@string/config_title_highlight_syntax" />
+
+
+        <ListPreference
+            android:entries="@array/color_highlight_names"
+            android:entryValues="@array/color_highlight_values"
+            android:key="highlight_theme"
+            android:title="@string/config_title_highlight_theme" />
+
+        <CheckBoxPreference
             android:defaultValue="false"
             android:key="auto_break_lines"
             android:summaryOn="@string/config_summary_word_wrap"
