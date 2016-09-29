@@ -23,6 +23,9 @@ public class Settings implements Constants {
 	/** color schem setting */
 	public static int COLOR_SCHEME = COLOR_SCHEME_CLASSIC;
 
+	/** language setting */
+	public static int LANGUAGE = LANGUAGE_DEFAULT;
+
 	/** when search reaches the end of a file, search wrap */
 	public static boolean SEARCHWRAP = false;
 	/** only search for matchin case */
@@ -101,6 +104,8 @@ public class Settings implements Constants {
 				("" + COLOR_CLASSIC));
 		COLOR_SCHEME = getStringPreferenceAsInteger(settings, PREFERENCE_HIGHTLIGHT_THEME,
 				("" + COLOR_SCHEME_CLASSIC));
+		LANGUAGE = getStringPreferenceAsInteger(settings, PREFERENCE_LANGUAGE,
+				("" + LANGUAGE_DEFAULT));
 
 		SEARCHWRAP = settings.getBoolean(PREFERENCE_SEARCHWRAP, false);
 		SEARCHMATCHCASE = settings.getBoolean(PREFERENCE_SEARCH_MATCH_CASE,
@@ -182,5 +187,10 @@ public class Settings implements Constants {
 	public static String getColorSchemeName(int color_scheme_index) {
 		String[] schemes = new String[] { "classicStyle", "draculaStyle" };
 		return  schemes[color_scheme_index];
+	}
+
+	public static String getLanguageName(int language_index) {
+		String[] schemes = new String[] { "cppTokens", "javascriptTokens", "htmlTokens" };
+		return  schemes[language_index];
 	}
 }

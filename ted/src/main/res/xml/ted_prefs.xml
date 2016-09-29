@@ -22,6 +22,12 @@
             android:key="highlight_theme"
             android:title="@string/config_title_highlight_theme" />
 
+        <ListPreference
+            android:entries="@array/languages_names"
+            android:entryValues="@array/languages_values"
+            android:key="language"
+            android:title="@string/language_title" />
+
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="auto_break_lines"

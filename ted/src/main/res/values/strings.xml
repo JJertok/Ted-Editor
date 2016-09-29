@@ -31,6 +31,8 @@
     <string name="config_title_text_size">Text size</string>
     <string name="config_title_color_theme">Color theme</string>
     <string name="config_title_highlight_theme">Highlight theme</string>
+    <string name="language_title">Choose programming languages</string>
+
     <string name="config_title_end_of_lines">End of lines</string>
     <string name="config_title_max_recent">Maximum recent files</string>
     <string name="config_title_search_wrap">Search wrap</string>

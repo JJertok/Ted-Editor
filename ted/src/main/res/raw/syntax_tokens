@@ -111,4 +111,21 @@
         <token styleToken="PREPROCESSOR" token="#error"/>
         <token styleToken="PREPROCESSOR" token="#pragma"/>
     </cppTokens>
+    <javascriptTokens>
+        <token styleToken="KEYWORD" token="function" />
+        <token styleToken="KEYWORD" token="while" />
+        <token styleToken="KEYWORD" token="if" />
+        <token styleToken="KEYWORD" token="for" />
+    </javascriptTokens>
+    <htmlTokens>
+        <token styleToken="KEYWORD" token="html" />
+        <token styleToken="KEYWORD" token="head" />
+        <token styleToken="KEYWORD" token="body" />
+        <token styleToken="KEYWORD" token="div" />
+        <token styleToken="KEYWORD" token="h1" />
+        <token styleToken="KEYWORD" token="h2" />
+        <token styleToken="KEYWORD" token="h3" />
+        <token styleToken="KEYWORD" token="p" />
+        <token styleToken="KEYWORD" token="hr" />
+    </htmlTokens>
 </SyntaxTokens>

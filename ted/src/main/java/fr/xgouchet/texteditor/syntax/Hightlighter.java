@@ -147,6 +147,7 @@ public class Hightlighter {
                 patternBuilder.append( "|");
             }
         }
+
         pattern = Pattern.compile(patternBuilder.toString());
     }
 }

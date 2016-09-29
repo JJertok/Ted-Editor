@@ -84,6 +84,8 @@ public interface Constants {
 	public static final String PREFERENCE_COLOR_THEME = "color_theme";
 	/** Preference tag to retrieve the hightlight Theme ( = {@value} ) */
 	public static final String PREFERENCE_HIGHTLIGHT_THEME = "highlight_theme";
+	/** Preference tag to retrieve the language( = {@value} ) */
+	public static final String PREFERENCE_LANGUAGE = "language";
 	/** Preference tag to retrieve the fling to scroll ( = {@value} ) */
 	public static final String PREFERENCE_FLING_TO_SCROLL = "fling_to_scroll";
 	/** Preference tag to retrieve if undo history is allowed ( = {@value} ) */
@@ -124,6 +126,9 @@ public interface Constants {
 	public static final int COLOR_CLASSIC = 0;
 	/** color theme default : black on white ( = {@value} ) */
 	public static final int COLOR_SCHEME_CLASSIC = 0;
+
+	/** color language: ( = {@value} ) */
+	public static final int LANGUAGE_DEFAULT = 0;
 
 	/** color theme negative : white on black ( = {@value} ) */
 	public static final int COLOR_NEGATIVE = 1;

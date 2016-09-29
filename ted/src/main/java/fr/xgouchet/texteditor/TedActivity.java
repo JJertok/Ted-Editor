@@ -92,8 +92,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
     protected void initHighlighter() {
         try {
-            highlighter.setSyntaxTokens(tokenReader.readSyntaxTokens(getResources().openRawResource(R.raw.syntax_tokens), "cppTokens"));
-            highlighter.setStyleTokens(tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens), Settings.getColorSchemeName(0)));
+            highlighter.setSyntaxTokens(tokenReader.readSyntaxTokens(getResources().openRawResource(R.raw.syntax_tokens), Settings.getLanguageName(Settings.LANGUAGE)));
+            highlighter.setStyleTokens(tokenReader.readStyleTokens(getResources().openRawResource(R.raw.style_tokens), Settings.getColorSchemeName(Settings.COLOR_SCHEME)));
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
