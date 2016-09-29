@@ -92,7 +92,7 @@ public class TokenReader {
                         parser.next();
                     } else skip(parser);
                 }
-            }
+            }else skip(parser);
         }
         return syntaxTokens;
     }
@@ -138,7 +138,7 @@ public class TokenReader {
                         parser.next();
                     } else skip(parser);
                 }
-            }
+            }else skip(parser);
         }
         return styleTokens;
     }

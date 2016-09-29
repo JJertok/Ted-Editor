@@ -5,4 +5,11 @@
         <style bold="false" color="#0000FF" italic="false" token="VARIABLE_TYPE" />
         <style bold="false" color="#808080" italic="false" token="PREPROCESSOR"/>
     </classicStyle>
+    <draculaStyle>
+        <style bold="false" color="#FFFFFF" italic="false" token="KEYWORD" />
+        <style bold="false" color="#FFFFFF" italic="false" token="VARIABLE_TYPE" />
+        <style bold="false" color="#FFFF00" italic="false" token="PREPROCESSOR"/>
+    </draculaStyle>
+
+
 </StyleTokens>

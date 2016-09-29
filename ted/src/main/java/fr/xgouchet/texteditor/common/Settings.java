@@ -180,7 +180,7 @@ public class Settings implements Constants {
 	}
 
 	public static String getColorSchemeName(int color_scheme_index) {
-		String[] schemes = new String[] { "classicStyle", "demoStyle" };
+		String[] schemes = new String[] { "classicStyle", "draculaStyle" };
 		return  schemes[color_scheme_index];
 	}
 }
