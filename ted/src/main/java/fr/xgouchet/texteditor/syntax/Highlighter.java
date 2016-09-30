@@ -127,7 +127,6 @@ public class Highlighter {
         }
     }
 
-
     /**
      * pre build regex pattern to match all tokens
      */
@@ -135,7 +134,6 @@ public class Highlighter {
         if (syntaxTokens == null) return;
         // build pattern to match all tokens
         StringBuilder patternBuilder = new StringBuilder();
-        String tok = "";
         for (SyntaxToken token :
                 syntaxTokens) {
           if(token.getToken().charAt(0)=='#')
