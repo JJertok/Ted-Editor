@@ -21,6 +21,7 @@ import android.widget.EditText;
 import android.widget.Scroller;
 
 import java.util.LinkedList;
+import java.util.Set;
 
 import fr.xgouchet.texteditor.R;
 import fr.xgouchet.texteditor.common.Constants;
@@ -48,6 +49,8 @@ public class AdvancedEditText extends EditText implements Constants,
 		mPaintNumbers.setAntiAlias(true);
 
 		mPaintHighlight = new Paint();
+
+		mPaintHighlightLine = new Paint();
 
 		mScale = context.getResources().getDisplayMetrics().density;
 		mPadding = (int) (mPaddingDP * mScale);
@@ -152,6 +155,8 @@ public class AdvancedEditText extends EditText implements Constants,
 			mMaxSize.y = Math.max(
 					mMaxSize.y + mPadding - mDrawingRect.height(), 0);
 		}
+
+		drawHightlightLines(canvas);
 
 		super.onDraw(canvas);
 	}
@@ -270,6 +275,10 @@ public class AdvancedEditText extends EditText implements Constants,
 		// wordwrap
 		setHorizontallyScrolling(!Settings.WORDWRAP);
 
+
+		// set highlight line color
+		mPaintHighlightLine.setColor(Color.RED);
+
 		// color Theme
 		switch (Settings.COLOR) {
 		case COLOR_NEGATIVE:
@@ -339,6 +348,41 @@ public class AdvancedEditText extends EditText implements Constants,
 
 	}
 
+
+	private Set<Integer> mHighlightLines;
+
+	public void setHighlightLines(Set<Integer> numberOfLines) {
+		mHighlightLines = numberOfLines;
+	}
+
+	public void clearHighlightLines() {
+		mHighlightLines.clear();
+	}
+
+	private void drawHightlightLines(Canvas canvas) {
+		// get number of lines
+		int count = getLineCount();
+		if(count == 0 || mHighlightLines == null) return;
+
+		// get the drawing boundaries, rect changing offset if textview had scrolled
+		getDrawingRect(mDrawingRect);
+
+		int height = canvas.getHeight();
+		int width = canvas.getWidth();
+
+		float position = 0;
+
+		// draw a highlight labels near a scrollbar area
+		for (Integer i :
+			 mHighlightLines) {
+			if(i < 0 || i >= count) continue;
+			position = (i/(float)count) * height + mDrawingRect.top;
+			canvas.drawLine(canvas.getWidth() + mDrawingRect.left - 20, position, canvas.getWidth() + mDrawingRect.left , position, mPaintHighlightLine);
+		}
+	}
+
+
+
 	/**
 	 * Compute the line to highlight based on selection
 	 */
@@ -371,6 +415,9 @@ public class AdvancedEditText extends EditText implements Constants,
 		}
 	}
 
+
+	/** The line numbers paint */
+	protected Paint mPaintHighlightLine;
 	/** The line numbers paint */
 	protected Paint mPaintNumbers;
 	/** The line numbers paint */
