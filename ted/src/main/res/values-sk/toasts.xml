@@ -23,6 +23,7 @@
     <string name="toast_search_not_found">Nenašla sa žiadna zhoda v súčasnom súbore</string>
     <string name="toast_search_eof">Nenašla sa žiadna ďalšia zhoda v súčasnom súbore</string>
     <string name="toast_search_no_input">Zadajte text dp vyhľadávacieho riadku, ktorý chcete vyhľadať</string>
+    <string name="toast_replace_not_found">Nič nahradiť</string>
     <string name="toast_filename_empty">Názov súboru nesmie byť prázdny</string>
     <string name="toast_warn_no_undo">Nič na vrátenie.</string>
     <string name="toast_warn_no_redo">Nič opakovať ešte</string>

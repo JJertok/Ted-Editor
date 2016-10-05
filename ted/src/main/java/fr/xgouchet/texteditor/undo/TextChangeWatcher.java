@@ -171,6 +171,22 @@ public class TextChangeWatcher implements Constants {
 		mCurrentChange = new TextChangeDelete(sub, start);
 	}
 
+
+	/**
+	 * @param ins
+	 *            the sequence being inserted
+	 * @param del
+	 *            the sequence before modified
+	 * @param start
+	 *            the index where replacing starts
+	 */
+	public void processReplace(CharSequence ins, CharSequence del, int start) {
+		if (mCurrentChange != null)
+			pushCurrentChange();
+
+		mCurrentChange = new TextChangeReplace(ins,del,start);
+	}
+
 	/**
 	 * Pushes the current change on top of the stack
 	 */

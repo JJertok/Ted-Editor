@@ -24,6 +24,7 @@
     <string name="toast_search_not_found">"Pas de résultat dans ce fichier"</string>
     <string name="toast_search_eof">"Pas d'autre résultat dans ce fichier"</string>
     <string name="toast_search_no_input">"Recherche vide"</string>
+    <string name="toast_replace_not_found">Rien à remplacer</string>
     <string name="toast_filename_empty">Le nom de fichier ne doit pas être vide</string>
     <string name="toast_warn_no_undo">Rien à annuler</string>
     <string name="toast_warn_no_redo">Rien à refaire plus</string>

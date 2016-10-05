@@ -100,6 +100,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
         findViewById(R.id.buttonSearchPrev).setOnClickListener(this);
+
+        //replace
+        mReplaceInput = (EditText) findViewById(R.id.textReplace);
+        findViewById(R.id.buttonReplace).setOnClickListener(this);
+        findViewById(R.id.buttonReplaceAll).setOnClickListener(this);
         mUseRegex.setOnCheckedChangeListener(this);
     }
 
@@ -113,6 +118,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             e.printStackTrace();
         }
     }
+
 
 
     /**
@@ -373,7 +379,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                                   int after) {
         beforeLength = s.length();
         if ((Settings.REDO && (!mInRedo) &&
-                Settings.UNDO && (!mInUndo))
+                Settings.UNDO && (!mInUndo) &&
+                (!mInReplace))
                 && (mWatcher != null))
             mWatcher.beforeChange(s, start, count, after);
     }
@@ -383,11 +390,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mInUndo || mInRedo || mInBrackets)
+        if (mInUndo || mInRedo || mInBrackets ||mInReplace)
             return;
         boolean bracketsChanged = true;
 
-        if (Settings.UNDO && (!mInUndo) && (mWatcher != null)) {
+        if (Settings.UNDO && (!mInUndo) && (mWatcher != null) &&(!mInReplace)) {
             if (s.length() > beforeLength) {
 
                 mInBrackets = true;
@@ -500,6 +507,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
             case R.id.buttonSearchPrev:
                 searchPrevious();
+                break;
+            case R.id.buttonReplace:
+                replace();
+                break;
+            case R.id.buttonReplaceAll:
+                replaceAll();
                 break;
         }
     }
@@ -1169,6 +1182,69 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
+     * Uses the user input to replace next founded value in file
+     */
+    protected void replace() {
+        mInReplace = false;
+        CharSequence replaceStr;
+        CharSequence searchStr;
+        int start,end;
+        replaceStr = mReplaceInput.getText().toString();
+        start = mEditor.getSelectionStart();
+        end = mEditor.getSelectionEnd();
+        searchStr = mEditor.getText().subSequence(start, end);
+        if(start!=end) {
+            mInReplace = true;
+            mEditor.getText().replace(start, end, replaceStr);
+            mWatcher.processReplace(replaceStr,searchStr,start);
+            searchNext();
+            mInReplace = false;
+        }
+        else {
+            Crouton.showText(this, R.string.toast_replace_not_found,
+                    Style.INFO);
+            mInReplace = false;
+        }
+
+    }
+
+    /**
+     * Uses the user input to replace all founded values in file
+     */
+    protected void replaceAll() {
+        mInReplace = false;
+        CharSequence searchStr;
+        CharSequence replaceStr;
+        String textBefore, textAfter;
+        Pattern mPattern;
+
+        searchStr = mSearchInput.getText().toString();
+        replaceStr = mReplaceInput.getText().toString();
+        textBefore = mEditor.getText().toString();
+
+        if (searchStr.length() == 0) {
+            Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
+            return;
+        }
+        mPattern = createSearchPattern(searchStr.toString());
+
+        if(mPattern.matcher(textBefore).find()) {
+            mInReplace = true;
+            textAfter = textBefore.replaceAll(mPattern.pattern(),replaceStr.toString());
+            mEditor.getText().replace(0,mEditor.getText().length(),textAfter);
+            mWatcher.processReplace(textAfter,textBefore,0);
+            mInReplace = false;
+        }
+        else
+            Crouton.showText(this, R.string.toast_replace_not_found,
+                    Style.INFO);
+            mInReplace = false;
+    }
+
+
+
+
+    /**
      * Opens the about activity
      */
     protected void aboutActivity() {
@@ -1279,6 +1355,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * the search input
      */
     protected EditText mSearchInput;
+
+    /**
+     * the replace input
+     */
+    protected EditText mReplaceInput;
+    protected boolean mInReplace;
 
     /**
      * the search options

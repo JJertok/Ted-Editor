@@ -20,9 +20,10 @@
     <string name="toast_save_success">Archivo guardado</string>
     <string name="toast_folder_cant_write">"No se puede escribir en el directorio. Permiso denegado"</string>
     <string name="toast_file_cant_read">"No se puede leer el directorio. Permiso denegado"</string>
-    <string name="toast_search_not_found">No se encuentran coincidencias</string>
+    <string name="toast_search_not_found">No hay nada que sustituya</string>
     <string name="toast_search_eof">No se encuentran más coincidencias</string>
     <string name="toast_search_no_input">Escribe algo en la barra de búsqueda</string>
+    <string name="toast_replace_not_found">No se encuentran coincidencias</string>
     <string name="toast_filename_empty">Escribe un nombre de archivo</string>
     <string name="toast_warn_no_undo">No se puede deshacer más.</string>
     <string name="toast_warn_no_redo">No hay nada que hacer de nuevo nunca más.</string>
