@@ -33,5 +33,5 @@
     <string name="toast_open_select">Elige un archivo para abrir</string>
     <string name="toast_home_page_select">Elige un archivo para abrir desde la pantalla de inicio</string>
     <string name="toast_file_saved_auto">"El archivo abierto se ha guardado automáticamente y será abierto en el siguiente inicio"</string>
-
+    <string name="toast_search_patter_incorrect">Patrón de expresión introducida incorrecta!</string>
 </resources>

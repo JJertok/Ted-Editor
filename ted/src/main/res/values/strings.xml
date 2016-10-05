@@ -22,7 +22,6 @@
     <string name="config_cat_other">Other</string>
     <string name="config_cat_save">Saving</string>
     <string name="config_cat_undo">Undo</string>
-    <string name="config_cat_search">Search</string>
     <string name="config_cat_misc">Miscellaneous</string>
     <string name="config_title_line_numbers">Show line numbers</string>
     <string name="config_title_highlight_syntax">Highlight syntax</string>
@@ -35,8 +34,6 @@
 
     <string name="config_title_end_of_lines">End of lines</string>
     <string name="config_title_max_recent">Maximum recent files</string>
-    <string name="config_title_search_wrap">Search wrap</string>
-    <string name="config_title_search_match_case">Search match case</string>
     <string name="config_title_encoding">Encoding</string>
     <string name="config_title_scroll_fling">Fling to scroll faster</string>
     <string name="config_title_allow_undo_stack">Allow undo</string>
@@ -82,6 +79,7 @@
     <string name="ui_use_regex">Use Regex</string>
     <string name="ui_case_sensitive">Case Sensitive</string>
     <string name="ui_whole_word">Whole Word</string>
+    <string name="ui_search_no_matches">No matches</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"All icons for this app were created and belong to the author of the app : Xavier Gouchet (android@xgouchet.fr)."</string>

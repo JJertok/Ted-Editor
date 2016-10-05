@@ -33,5 +33,5 @@
     <string name="toast_open_select">Vyberte súbor na otvorenie</string>
     <string name="toast_home_page_select">Vyberte súbor, ktorý chcete otvoriť pri spustení Teda z domovskej obrazovky</string>
     <string name="toast_file_saved_auto">"Otvorený súbor sa uložil automaticky a bude otvorený pri ďalšom spustení"</string>
-
+    <string name="toast_search_patter_incorrect">Zadané regex vzorom nesprávne!</string>
 </resources>

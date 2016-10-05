@@ -26,11 +26,6 @@ public class Settings implements Constants {
 	/** language setting */
 	public static int LANGUAGE = LANGUAGE_DEFAULT;
 
-	/** when search reaches the end of a file, search wrap */
-	public static boolean SEARCHWRAP = false;
-	/** only search for matchin case */
-	public static boolean SEARCHMATCHCASE = false;
-
 	/** Text size setting */
 	public static int TEXT_SIZE = 12;
 
@@ -106,10 +101,6 @@ public class Settings implements Constants {
 				("" + COLOR_SCHEME_CLASSIC));
 		LANGUAGE = getStringPreferenceAsInteger(settings, PREFERENCE_LANGUAGE,
 				("" + LANGUAGE_DEFAULT));
-
-		SEARCHWRAP = settings.getBoolean(PREFERENCE_SEARCHWRAP, false);
-		SEARCHMATCHCASE = settings.getBoolean(PREFERENCE_SEARCH_MATCH_CASE,
-				false);
 		ENCODING = settings.getString(PREFERENCE_ENCODING, ENC_UTF8);
 		FLING_TO_SCROLL = settings.getBoolean(PREFERENCE_FLING_TO_SCROLL, true);
 

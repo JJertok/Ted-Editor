@@ -19,7 +19,6 @@
     <string name="config_cat_display">Affichage</string>
     <string name="config_cat_other">Autres</string>
     <string name="config_cat_save">Sauvegarde</string>
-    <string name="config_cat_search">Recherche</string>
     <string name="config_cat_undo">Historique</string>
     <string name="config_cat_misc">Divers</string>
     <string name="config_title_font">Changer la police</string>
@@ -31,8 +30,6 @@
     <string name="config_title_hightlight_theme">thème Highlight</string>
     <string name="config_title_end_of_lines">Fin de lignes</string>
     <string name="config_title_max_recent">Fichiers récents</string>
-    <string name="config_title_search_wrap">Recherche en boucle</string>
-    <string name="config_title_search_match_case">Recherche sensible à la casse</string>
     <string name="config_title_encoding">Encodage</string>
     <string name="config_title_scroll_fling">Défilement par lancé</string>
     <string name="config_title_allow_undo_stack">"Activer l'option \"Annuler\""</string>
@@ -77,6 +74,7 @@
     <string name="ui_use_regex">Utilisez Regex</string>
     <string name="ui_case_sensitive">Sensible aux majuscules et minuscules</string>
     <string name="ui_whole_word">Mot entier</string>
+    <string name="ui_search_no_matches">Pas de correspondance</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"Toutes les icônes de cette application ont été créées et appartiennent à l'auteur de l'application : Xavier Gouchet (android@xgouchet.fr)."</string>

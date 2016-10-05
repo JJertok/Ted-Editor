@@ -22,7 +22,6 @@
     <string name="config_cat_other">Ostatné</string>
     <string name="config_cat_save">Ukladanie</string>
     <string name="config_cat_undo">Krok späť</string>
-    <string name="config_cat_search">Hľadať</string>
     <string name="config_cat_misc">Rôzne</string>
     <string name="config_title_line_numbers">Zobraziť čísla riadkov</string>
     <string name="config_title_highlight_syntax">vrhunec sintaksa</string>
@@ -33,8 +32,6 @@
     <string name="config_title_hightlight_theme">Prioritetna tema</string>
     <string name="config_title_end_of_lines">Koniec riadkov</string>
     <string name="config_title_max_recent">Maximálny počet nedávnych súborov</string>
-    <string name="config_title_search_wrap">Zalomiť hľadanie</string>
-    <string name="config_title_search_match_case">Hľadať veľké a malé písmená</string>
     <string name="config_title_encoding">Kódovanie</string>
     <string name="config_title_scroll_fling">Vrhnúť pre rýchlejší posun</string>
     <string name="config_title_allow_undo_stack">Povoliť krok späť</string>
@@ -79,6 +76,7 @@
     <string name="ui_use_regex">Použitie Regex</string>
     <string name="ui_case_sensitive">Case Sensitive</string>
     <string name="ui_whole_word">Celé Slovo</string>
+    <string name="ui_search_no_matches">Ziadne zápasy</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"Všetky ikony pre túto aplikáciu boli vytvorené a patria autorovi aplikácie: Xavier Gouchet (android@xgouchet.fr)."</string>

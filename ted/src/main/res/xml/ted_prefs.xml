@@ -102,16 +102,6 @@
                 android:key="back_button_as_undo"
                 android:title="@string/config_title_back_to_undo" />
         </PreferenceScreen>
-        <PreferenceScreen android:title="@string/config_cat_search" >
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="search_wrap"
-                android:title="@string/config_title_search_wrap" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="search_match_case"
-                android:title="@string/config_title_search_match_case" />
-        </PreferenceScreen>
         <PreferenceScreen android:title="@string/config_cat_misc" >
             <CheckBoxPreference
                 android:defaultValue="true"

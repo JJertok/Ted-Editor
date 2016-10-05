@@ -22,7 +22,6 @@
     <string name="config_cat_other">Otros</string>
     <string name="config_cat_save">Guardado</string>
     <string name="config_cat_undo">Configurar deshacer</string>
-    <string name="config_cat_search">Búsqueda</string>
     <string name="config_cat_misc">Configuración avanzada</string>
     <string name="config_title_line_numbers">Mostrar números en cada línea</string>
     <string name="config_title_highlight_syntax">Resaltar la sintaxisx</string>
@@ -33,8 +32,6 @@
     <string name="config_title_hightlight_theme">El tema más destacado</string>
     <string name="config_title_end_of_lines">Retorno de carro</string>
     <string name="config_title_max_recent">Máximo número de archivos recientes</string>
-    <string name="config_title_search_wrap">Buscar en todo el documento</string>
-    <string name="config_title_search_match_case">Respetar mayúsculas y minúsculas</string>
     <string name="config_title_encoding">Codificación</string>
     <string name="config_title_scroll_fling">Efecto de scroll</string>
     <string name="config_title_allow_undo_stack">Habilitar deshacer</string>
@@ -79,6 +76,7 @@
     <string name="ui_use_regex">Usar Regex</string>
     <string name="ui_case_sensitive">Distingue mayúsculas y minúsculas</string>
     <string name="ui_whole_word">Toda Palabra</string>
+    <string name="ui_search_no_matches">No hay coincidencias</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"Todos los iconos de esta aplicación fueron creados por el desarrollador de la misma. Derechos de propiedad intelectual reservados por Xavier Gouchet (android@xgouchet.fr)."</string>

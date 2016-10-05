@@ -11,6 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -27,13 +31,18 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
+import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -51,7 +60,7 @@ import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
-        OnClickListener, UpdateSettingListener {
+        OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener {
 
     /**
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -84,9 +93,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         // search
         mSearchLayout = findViewById(R.id.searchLayout);
         mSearchInput = (EditText) findViewById(R.id.textSearch);
-       // findViewById(R.id.buttonSearchClose).setOnClickListener(this);
+        mUseRegex = (CheckBox) findViewById(R.id.checkBoxUseRegex);
+        mCaseSensitive = (CheckBox) findViewById(R.id.checkBoxCaseSensitive);
+        mWholeWord = (CheckBox) findViewById(R.id.checkBoxWholeWord);
+        mSearchResults = (TextView) findViewById(R.id.textViewSearchResult);
+
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
         findViewById(R.id.buttonSearchPrev).setOnClickListener(this);
+        mUseRegex.setOnCheckedChangeListener(this);
     }
 
     protected void initHighlighter() {
@@ -99,7 +113,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             e.printStackTrace();
         }
     }
-
 
 
     /**
@@ -381,7 +394,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 bracketsChanged = bracketsController(s, start);
                 mInBrackets = false;
             }
-          if(!bracketsChanged)  mWatcher.afterChange(s, start, before, count);
+            if (!bracketsChanged) mWatcher.afterChange(s, start, before, count);
         }
     }
 
@@ -390,41 +403,41 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @param start Index of first added element
      */
     public boolean bracketsController(CharSequence s, int start) {
-            String secondBracket ="";
+        String secondBracket = "";
 
         switch (s.charAt(start)) {
             case '(':
-                secondBracket=")";
+                secondBracket = ")";
                 break;
             case '{':
-                secondBracket="}";
+                secondBracket = "}";
                 break;
             case '[':
-                secondBracket="]";
+                secondBracket = "]";
                 break;
             case '<':
-                secondBracket=">";
+                secondBracket = ">";
                 break;
         }
 
-        if(secondBracket.equals("")) return false;
-        s = insertInString(s, secondBracket, start+1);
+        if (secondBracket.equals("")) return false;
+        s = insertInString(s, secondBracket, start + 1);
         mWatcher.afterChange(s.toString(), start, 0, 2);
-        mEditor.getText().insert(start+1,""+secondBracket);
-        mEditor.setSelection(start+1);
+        mEditor.getText().insert(start + 1, "" + secondBracket);
+        mEditor.setSelection(start + 1);
         return true;
     }
 
     /**
-     * @param s - string in which will insert
+     * @param s      - string in which will insert
      * @param insert - string, which will be inserted
-     * @param start - insert position
+     * @param start  - insert position
      */
     public CharSequence insertInString(CharSequence s, CharSequence insert, int start) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(s);
-        sb.insert(start,insert);
+        sb.insert(start, insert);
         return sb.toString();
     }
 
@@ -432,7 +445,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
      */
     public void afterTextChanged(Editable s) {
-        if(Settings.HIGHLIGHT_SYNTAX) {
+        if (Settings.HIGHLIGHT_SYNTAX) {
             updateHightlightSettings();
             highlighter.highlight(s);
         } else {
@@ -445,10 +458,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
     }
 
-    int previousHighlightScheme = 0;
-    int previousLanguage = 0;
     private void updateHightlightSettings() {
-        if(previousHighlightScheme != Settings.COLOR_SCHEME || previousLanguage != Settings.LANGUAGE) {
+        if (previousHighlightScheme != Settings.COLOR_SCHEME || previousLanguage != Settings.LANGUAGE) {
             previousHighlightScheme = Settings.COLOR_SCHEME;
             previousLanguage = Settings.LANGUAGE;
             initHighlighter();
@@ -484,9 +495,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void onClick(View v) {
         mWarnedShouldQuit = false;
         switch (v.getId()) {
-          //  case R.id.buttonSearchClose:
-         //       search();
-      //          break;
             case R.id.buttonSearchNext:
                 searchNext();
                 break;
@@ -986,43 +994,55 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Uses the user input to search a file
      */
     protected void searchNext() {
+
         String search, text;
-        int selection, next;
+        int selection;
+        Pattern mPattern;
+        Matcher mMatcher, mSizeMatcher;
+        ArrayList<Pair<Integer, Integer>> matches;
+
 
         search = mSearchInput.getText().toString();
         text = mEditor.getText().toString();
         selection = mEditor.getSelectionEnd();
-
+        //Check search input is empty!
         if (search.length() == 0) {
             Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
             return;
         }
 
-        if (!Settings.SEARCHMATCHCASE) {
-            search = search.toLowerCase();
-            text = text.toLowerCase();
+        mPattern = createSearchPattern(search);
+        if (mPattern == null) return;
+        mMatcher = mPattern.matcher(text);
+        mSizeMatcher = mPattern.matcher(text);
+        matches = new ArrayList<Pair<Integer, Integer>>();
+
+        while (mSizeMatcher.find()) {
+            matches.add(new Pair<Integer, Integer>(mSizeMatcher.start(),
+                    mSizeMatcher.end() - mSizeMatcher.start()));
         }
+        if (!mMatcher.find(selection)) {
+            Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
 
-        next = text.indexOf(search, selection);
-
-        if (next > -1) {
-            mEditor.setSelection(next, next + search.length());
+        } else {
+            mEditor.setSelection(mMatcher.start(), mMatcher.start() + (mMatcher.end() - mMatcher.start()));
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
-        } else {
-            if (Settings.SEARCHWRAP) {
-                next = text.indexOf(search);
-                if (next > -1) {
-                    mEditor.setSelection(next, next + search.length());
-                    if (!mEditor.isFocused())
-                        mEditor.requestFocus();
-                } else {
-                    Crouton.showText(this, R.string.toast_search_not_found,
-                            Style.INFO);
-                }
-            } else {
-                Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
+        }
+
+        if (matches.size() == 0) mSearchResults.setText(R.string.ui_search_no_matches);
+        else {
+            String searchResult = "";
+            if (!mMatcher.find(selection)) {
+                searchResult += matches.size() + " of " + matches.size();
+                mEditor.setSelection(matches.get(matches.size()-1).first,
+                        matches.get(matches.size()-1).first+matches.get(matches.size()-1).second);
+            }else {
+                searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start(),
+                        mMatcher.end() - mMatcher.start())) + 1);
+                searchResult += " of " + matches.size();
             }
+            mSearchResults.setText(searchResult);
         }
     }
 
@@ -1031,43 +1051,124 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected void searchPrevious() {
         String search, text;
-        int selection, next;
+        int selection, prev = -1, size = -1;
+        Pattern mPattern;
+        Matcher mMatcher, mSizeMatcher;
+        ArrayList<Pair<Integer, Integer>> matches;
 
         search = mSearchInput.getText().toString();
         text = mEditor.getText().toString();
         selection = mEditor.getSelectionStart() - 1;
 
+        //Check search input is empty!
         if (search.length() == 0) {
             Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
             return;
         }
+        mPattern = createSearchPattern(search);
+        if (mPattern == null) return;
+        mMatcher = mPattern.matcher(text);
+        mMatcher = mMatcher.region(0, selection);
+        mSizeMatcher = mPattern.matcher(text);
+        matches = new ArrayList<Pair<Integer, Integer>>();
 
-        if (!Settings.SEARCHMATCHCASE) {
-            search = search.toLowerCase();
-            text = text.toLowerCase();
+
+        while (mSizeMatcher.find()) {
+            matches.add(new Pair<Integer, Integer>(mSizeMatcher.start(),
+                    mSizeMatcher.end() - mSizeMatcher.start()));
         }
 
-        next = text.lastIndexOf(search, selection);
+        while (mMatcher.find()) {
+            prev = mMatcher.start();
+            size = mMatcher.end() - mMatcher.start();
+        }
 
-        if (next > -1) {
-            mEditor.setSelection(next, next + search.length());
+        if (prev == -1) {
+            Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
+        } else {
+            mEditor.setSelection(prev, prev + size);
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
-        } else {
-            if (Settings.SEARCHWRAP) {
-                next = text.lastIndexOf(search);
-                if (next > -1) {
-                    mEditor.setSelection(next, next + search.length());
-                    if (!mEditor.isFocused())
-                        mEditor.requestFocus();
-                } else {
-                    Crouton.showText(this, R.string.toast_search_not_found,
-                            Style.INFO);
-                }
-            } else {
-                Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
-            }
         }
+
+        if (matches.size() == 0) mSearchResults.setText(R.string.ui_search_no_matches);
+        else {
+            String searchResult = "";
+            if (prev == -1) {
+                searchResult += 1 + " of " + matches.size();
+                mEditor.setSelection(matches.get(0).first, matches.get(0).first + matches.get(0).second);
+            } else {
+                searchResult += (matches.indexOf(new Pair<Integer, Integer>(prev,
+                        size)) + 1);
+                searchResult += " of " + matches.size();
+            }
+            mSearchResults.setText(searchResult);
+        }
+    }
+
+    /**
+     * @param s String with regular expression which need to be escaped
+     * @return String with escaped regular expression.
+     */
+    protected String escapeRegex(String s) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++)
+            switch (s.charAt(i)) {
+                case '\\':
+                case '^':
+                case '$':
+                case '*':
+                case '+':
+                case '?':
+                case '.':
+                case '(':
+                case ')':
+                case '[':
+                case ']':
+                case '{':
+                case '}':
+                case '#':
+                case '|':
+                case ',':
+                case '=':
+                case '!':
+                    result += "\\" + s.charAt(i);
+                    break;
+                default:
+                    result += "" + s.charAt(i);
+            }
+
+        return result;
+    }
+
+    /**
+     * @param search entered search string
+     * @return patter for searching.
+     */
+    protected Pattern createSearchPattern(String search) {
+
+        Pattern mPattern;
+        try {
+            //Check search mode with regex or not.
+            if (mUseRegex.isChecked()) {
+                mPattern = Pattern.compile(search, Pattern.MULTILINE);
+            } else {
+                search = escapeRegex(search);
+                mPattern = Pattern.compile(search);
+
+                if (mWholeWord.isChecked()) {
+                    mPattern = Pattern.compile("\\b" + search + "\\b");
+                }
+            }
+            //Check sensitive mode (default sensitive make recompile for changing)
+            if (!mCaseSensitive.isChecked()) {
+                mPattern = Pattern.compile(mPattern.pattern(), mPattern.flags() | Pattern.CASE_INSENSITIVE);
+            }
+        } catch (java.util.regex.PatternSyntaxException e) {
+            Crouton.showText(this, R.string.toast_search_patter_incorrect, Style.INFO);
+            return null;
+        }
+        return mPattern;
     }
 
     /**
@@ -1128,6 +1229,25 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             invalidateOptionsMenu();
     }
 
+    @Override
+    public void updateSetting() {
+        Editable s = mEditor.getEditableText();
+        if (Settings.HIGHLIGHT_SYNTAX) {
+            updateHightlightSettings();
+            highlighter.highlight(s);
+        } else {
+            highlighter.clear(s);
+        }
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            mWholeWord.setEnabled(false);
+            mWholeWord.setChecked(false);
+        } else mWholeWord.setEnabled(true);
+    }
+
     /**
      * the text editor
      */
@@ -1164,6 +1284,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected EditText mSearchInput;
 
     /**
+     * the search options
+     */
+    protected CheckBox mUseRegex;
+    protected CheckBox mCaseSensitive;
+    protected CheckBox mWholeWord;
+
+    /**
+     * the search results
+     */
+    protected TextView mSearchResults;
+
+    /**
      * Undo watcher
      */
     protected TextChangeWatcher mWatcher;
@@ -1177,6 +1309,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected Highlighter highlighter;
     protected TokenReader tokenReader;
+    int previousHighlightScheme = 0;
+    int previousLanguage = 0;
 
     /**
      * Brackets checker
@@ -1188,14 +1322,4 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected boolean mReadIntent;
 
-    @Override
-    public void updateSetting() {
-        Editable s  = mEditor.getEditableText();
-        if(Settings.HIGHLIGHT_SYNTAX) {
-            updateHightlightSettings();
-            highlighter.highlight(s);
-        } else {
-            highlighter.clear(s);
-        }
-    }
 }

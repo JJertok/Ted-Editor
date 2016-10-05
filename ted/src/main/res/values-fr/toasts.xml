@@ -34,5 +34,5 @@
     <string name="toast_open_select">Sélectionnez un fichier à ouvrir</string>
     <string name="toast_home_page_select">Sélectionnez un fichier à ouvrir au démarrage de Ted</string>
     <string name="toast_file_saved_auto">"Le document a été sauvegardé et sera réouvert au prochain démarrage de Ted"</string>
-
+    <string name="toast_search_patter_incorrect">Motif regex Entré incorrect!</string>
 </resources>
