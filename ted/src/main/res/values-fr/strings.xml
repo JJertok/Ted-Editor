@@ -74,7 +74,9 @@
     <string name="ui_history">Historique</string>
     <string name="ui_art_licence">Licence Artistique</string>
     <string name="ui_force_read_only">Ouvrir en lecture seule</string>
-
+    <string name="ui_use_regex">Utilisez Regex</string>
+    <string name="ui_case_sensitive">Sensible aux majuscules et minuscules</string>
+    <string name="ui_whole_word">Mot entier</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"Toutes les icônes de cette application ont été créées et appartiennent à l'auteur de l'application : Xavier Gouchet (android@xgouchet.fr)."</string>
