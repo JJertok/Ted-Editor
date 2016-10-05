@@ -1035,9 +1035,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             String searchResult = "";
             if (!mMatcher.find(selection)) {
                 searchResult += matches.size() + " of " + matches.size();
-                mEditor.setSelection(matches.get(matches.size()-1).first,
-                        matches.get(matches.size()-1).first+matches.get(matches.size()-1).second);
-            }else {
+                mEditor.setSelection(matches.get(matches.size() - 1).first,
+                        matches.get(matches.size() - 1).first + matches.get(matches.size() - 1).second);
+            } else {
                 searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start(),
                         mMatcher.end() - mMatcher.start())) + 1);
                 searchResult += " of " + matches.size();
@@ -1068,21 +1068,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mPattern = createSearchPattern(search);
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
-        mMatcher = mMatcher.region(0, selection);
+        mMatcher = mMatcher.region(0, selection == -1 ? 0 : selection);
         mSizeMatcher = mPattern.matcher(text);
         matches = new ArrayList<Pair<Integer, Integer>>();
-
 
         while (mSizeMatcher.find()) {
             matches.add(new Pair<Integer, Integer>(mSizeMatcher.start(),
                     mSizeMatcher.end() - mSizeMatcher.start()));
         }
-
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
         }
-
         if (prev == -1) {
             Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
         } else {
