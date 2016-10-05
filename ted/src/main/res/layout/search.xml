@@ -15,7 +15,7 @@
                 android:id="@+id/textSearch"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5"
+                android:layout_weight="1"
                 android:drawableLeft="@android:drawable/ic_menu_search"
                 android:drawablePadding="8dp"
                 android:hint="@string/ui_hint_search"
@@ -24,7 +24,7 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0"
                 android:layout_marginBottom="10dp"
                 android:text=""
                 android:id="@+id/textViewSearchResult" />
