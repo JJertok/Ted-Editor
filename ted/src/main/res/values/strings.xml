@@ -75,10 +75,11 @@
     <string name="ui_cancel">Cancel</string>
     <string name="ui_hint_file_name">File name</string>
     <string name="ui_hint_search">Search</string>
+    <string name="ui_hint_replace">Replace</string>
     <string name="ui_art_licence">Artistic Licence</string>
     <string name="ui_history">History</string>
     <string name="ui_force_read_only">Open as read only</string>
-
+    <string name="ui_use_regex">Use Regex</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"All icons for this app were created and belong to the author of the app : Xavier Gouchet (android@xgouchet.fr)."</string>

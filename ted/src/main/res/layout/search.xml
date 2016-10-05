@@ -3,37 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:visibility="gone" >
+    android:visibility="gone">
 
-    <ImageButton
-        android:id="@+id/buttonSearchClose"
-        style="@style/ButtonSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_delete" />
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/textSearch"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:drawableLeft="@drawable/ic_search"
-        android:drawablePadding="8dp"
-        android:hint="@string/ui_hint_search"
-        android:inputType="text" />
+        <TableRow>
+            <ToggleButton
+                android:id="@+id/toggleSearchRegex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:src="@android:drawable/ic_media_next" />
+            <EditText
+                android:id="@+id/textSearch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_search"
+                android:drawablePadding="8dp"
+                android:hint="@string/ui_hint_search"
+                android:inputType="text" />
 
-    <ImageButton
-        android:id="@+id/buttonSearchPrev"
-        style="@style/ButtonSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_media_previous" />
+            <ImageButton
+                android:id="@+id/buttonSearchPrev"
+                style="@style/ButtonSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_previous" />
 
-    <ImageButton
-        android:id="@+id/buttonSearchNext"
-        style="@style/ButtonSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_media_next" />
+            <ImageButton
+                android:id="@+id/buttonSearchNext"
+                style="@style/ButtonSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_next" />
+        </TableRow>
+        <TableRow>
+            <EditText
+                android:id="@+id/textReplace"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableLeft="@drawable/ic_replace"
+                android:drawablePadding="8dp"
+                android:hint="@string/ui_hint_replace"
+                android:inputType="text" />
 
+            <ImageButton
+                android:id="@+id/buttonReplaceNext"
+                style="@style/ButtonSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_next" />
+
+            <ImageButton
+                android:id="@+id/buttonReplaceAll"
+                style="@style/ButtonSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_media_previous" />
+        </TableRow>
+    </TableLayout>
 </LinearLayout>

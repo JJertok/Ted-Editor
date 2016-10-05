@@ -84,7 +84,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         // search
         mSearchLayout = findViewById(R.id.searchLayout);
         mSearchInput = (EditText) findViewById(R.id.textSearch);
-        findViewById(R.id.buttonSearchClose).setOnClickListener(this);
+       // findViewById(R.id.buttonSearchClose).setOnClickListener(this);
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
         findViewById(R.id.buttonSearchPrev).setOnClickListener(this);
     }
@@ -484,9 +484,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void onClick(View v) {
         mWarnedShouldQuit = false;
         switch (v.getId()) {
-            case R.id.buttonSearchClose:
-                search();
-                break;
+          //  case R.id.buttonSearchClose:
+         //       search();
+      //          break;
             case R.id.buttonSearchNext:
                 searchNext();
                 break;
