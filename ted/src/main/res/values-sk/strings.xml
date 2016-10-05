@@ -76,7 +76,9 @@
     <string name="ui_art_licence">Umelecká licencia</string>
     <string name="ui_history">História</string>
     <string name="ui_force_read_only">Otvoriť len na čítanie</string>
-
+    <string name="ui_use_regex">Použitie Regex</string>
+    <string name="ui_case_sensitive">Case Sensitive</string>
+    <string name="ui_whole_word">Celé Slovo</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"Všetky ikony pre túto aplikáciu boli vytvorené a patria autorovi aplikácie: Xavier Gouchet (android@xgouchet.fr)."</string>
