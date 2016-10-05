@@ -79,7 +79,7 @@
     <string name="ui_use_regex">Use Regex</string>
     <string name="ui_case_sensitive">Case Sensitive</string>
     <string name="ui_whole_word">Whole Word</string>
-    <string name="ui_search_no_matches">No matches</string>
+    <string name="ui_search_no_matches">0 of 0</string>
     <!-- Misc Strings -->
     <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porttitor neque semper sem fermentum pretium. Sed pharetra dui faucibus massa malesuada in condimentum mi gravida."</string>
     <string name="art_licence">"All icons for this app were created and belong to the author of the app : Xavier Gouchet (android@xgouchet.fr)."</string>
