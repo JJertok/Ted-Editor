@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -169,6 +170,13 @@ public class AdvancedEditText extends EditText implements Constants,
 	 */
 	public boolean onTouchEvent(MotionEvent event) {
 
+		// check for tap and cancel fling
+		if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_DOWN)
+		{
+			if(!mTedScroller.isFinished()){
+				mTedScroller.abortAnimation();
+			}
+		}
 		super.onTouchEvent(event);
 		if (mGestureDetector != null) {
 			return mGestureDetector.onTouchEvent(event);
