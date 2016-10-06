@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
@@ -20,6 +21,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Scroller;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
@@ -358,7 +361,21 @@ public class AdvancedEditText extends EditText implements Constants,
 	}
 
 	/**
-	 * Clear all highlightes lines
+	 * Set hightlight matches
+	 */
+	public void setHighlightMatches(ArrayList<Pair<Integer,Integer>> matches) {
+		if(mHighlightLines == null) mHighlightLines = new HashSet<Integer>();
+		else mHighlightLines.clear();
+
+		String text = getText().toString();
+		for (Pair<Integer, Integer> selection:
+			 matches) {
+			mHighlightLines.add(getHighlightLine(text, selection.first));
+		}
+	}
+
+	/**
+	 * Clear all highlights lines
 	 */
 	public void clearHighlightLines() {
 		mHighlightLines.clear();
@@ -408,20 +425,29 @@ public class AdvancedEditText extends EditText implements Constants,
 		if (mHighlightStart != selStart) {
 			text = getText().toString();
 
-			line = i = 0;
-			while (i < selStart) {
-				i = text.indexOf("\n", i);
-				if (i < 0) {
-					break;
-				}
-				if (i < selStart) {
-					++line;
-				}
-				++i;
-			}
-
-			mHighlightedLine = line;
+			mHighlightedLine = getHighlightLine(text, selStart);
 		}
+	}
+
+	/**
+	 * Get number of line by selection
+	 */
+	protected int getHighlightLine(String text, int start) {
+		int i, line;
+
+		line = i = 0;
+		while (i < start) {
+			i = text.indexOf("\n", i);
+			if (i < 0) {
+				break;
+			}
+			if (i < start) {
+				++line;
+			}
+			++i;
+		}
+
+		return line;
 	}
 
 	/** The set of highlight lines*/

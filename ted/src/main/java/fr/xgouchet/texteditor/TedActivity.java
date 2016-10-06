@@ -999,6 +999,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             case View.VISIBLE:
             default:
                 mSearchLayout.setVisibility(View.GONE);
+                mEditor.clearHighlightLines();
                 break;
         }
     }
@@ -1190,7 +1191,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                     mMatcher.end() - mMatcher.start()));
         }
 
-    return result;
+        mEditor.setHighlightMatches(result);
+        return result;
     }
 
     /**
