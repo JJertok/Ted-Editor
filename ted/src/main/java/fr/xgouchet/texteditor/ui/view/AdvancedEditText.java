@@ -276,9 +276,6 @@ public class AdvancedEditText extends EditText implements Constants,
 		setHorizontallyScrolling(!Settings.WORDWRAP);
 
 
-		// set highlight line color
-		mPaintHighlightLine.setColor(Color.RED);
-
 		// color Theme
 		switch (Settings.COLOR) {
 		case COLOR_NEGATIVE:
@@ -286,24 +283,28 @@ public class AdvancedEditText extends EditText implements Constants,
 			setTextColor(Color.WHITE);
 			mPaintHighlight.setColor(Color.WHITE);
 			mPaintNumbers.setColor(Color.GRAY);
+			mPaintHighlightLine.setColor(Color.WHITE);
 			break;
 		case COLOR_MATRIX:
 			setBackgroundResource(R.drawable.textfield_matrix);
 			setTextColor(Color.GREEN);
 			mPaintHighlight.setColor(Color.GREEN);
 			mPaintNumbers.setColor(Color.rgb(0, 128, 0));
+			mPaintHighlightLine.setColor(Color.GREEN);
 			break;
 		case COLOR_SKY:
 			setBackgroundResource(R.drawable.textfield_sky);
 			setTextColor(Color.rgb(0, 0, 64));
 			mPaintHighlight.setColor(Color.rgb(0, 0, 64));
 			mPaintNumbers.setColor(Color.rgb(0, 128, 255));
+			mPaintHighlightLine.setColor(Color.rgb(255,127,39));
 			break;
 		case COLOR_DRACULA:
 			setBackgroundResource(R.drawable.textfield_dracula);
 			setTextColor(Color.RED);
 			mPaintHighlight.setColor(Color.RED);
 			mPaintNumbers.setColor(Color.rgb(192, 0, 0));
+			mPaintHighlightLine.setColor(Color.RED);
 			break;
 		case COLOR_CLASSIC:
 		default:
@@ -311,6 +312,7 @@ public class AdvancedEditText extends EditText implements Constants,
 			setTextColor(Color.BLACK);
 			mPaintHighlight.setColor(Color.BLACK);
 			mPaintNumbers.setColor(Color.GRAY);
+			mPaintHighlightLine.setColor(Color.rgb(251,194,0));
 			break;
 		}
 		mPaintHighlight.setAlpha(48);
@@ -344,21 +346,28 @@ public class AdvancedEditText extends EditText implements Constants,
 			setPadding(mPadding, mPadding, mPadding, mPadding);
 		}
 
-
-
 	}
 
 
-	private Set<Integer> mHighlightLines;
-
+	/**
+	 * Set number of line for hightlights
+	 * @param numberOfLines
+     */
 	public void setHighlightLines(Set<Integer> numberOfLines) {
 		mHighlightLines = numberOfLines;
 	}
 
+	/**
+	 * Clear all highlightes lines
+	 */
 	public void clearHighlightLines() {
 		mHighlightLines.clear();
 	}
 
+	/**
+	 * Draw setted highlight lines
+	 * @param canvas
+     */
 	private void drawHightlightLines(Canvas canvas) {
 		// get number of lines
 		int count = getLineCount();
@@ -415,6 +424,8 @@ public class AdvancedEditText extends EditText implements Constants,
 		}
 	}
 
+	/** The set of highlight lines*/
+	private Set<Integer> mHighlightLines;
 
 	/** The line numbers paint */
 	protected Paint mPaintHighlightLine;
