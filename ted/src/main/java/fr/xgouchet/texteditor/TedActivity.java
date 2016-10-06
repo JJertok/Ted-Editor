@@ -120,7 +120,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
 
-
     /**
      * @see android.app.Activity#onStart()
      */
@@ -390,11 +389,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mInUndo || mInRedo || mInBrackets ||mInReplace)
+        if (mInUndo || mInRedo || mInBrackets || mInReplace)
             return;
         boolean bracketsChanged = true;
 
-        if (Settings.UNDO && (!mInUndo) && (mWatcher != null) &&(!mInReplace)) {
+        if (Settings.UNDO && (!mInUndo) && (mWatcher != null) && (!mInReplace)) {
             if (s.length() > beforeLength) {
 
                 mInBrackets = true;
@@ -1014,7 +1013,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         Pattern mPattern;
         Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
-
+        Boolean matchFound = false;
 
         search = mSearchInput.getText().toString();
         text = mEditor.getText().toString();
@@ -1028,31 +1027,27 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mPattern = createSearchPattern(search);
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
+        matches = checkAllMatches(text, mPattern);
 
-        matches = checkAllMatches(text,mPattern);
+        matchFound = mMatcher.find(selection);
 
-
-        if (!mMatcher.find(selection)) {
-            Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
-
-        } else {
+        if (!matchFound) {
+            mMatcher = mMatcher.region(0, mEditor.getSelectionStart() == 0 ?
+                    mEditor.getSelectionStart() : mEditor.getSelectionStart() - 1);
+            matchFound = mMatcher.find();
+        }
+        if (matchFound) {
             mEditor.setSelection(mMatcher.start(), mMatcher.start() + (mMatcher.end() - mMatcher.start()));
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
-        }
+        } else Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
 
-        if (matches.size() == 0) mSearchResults.setText(R.string.ui_search_no_matches);
+        if (!matchFound) mSearchResults.setText(R.string.ui_search_no_matches);
         else {
             String searchResult = "";
-            if (!mMatcher.find(selection)) {
-                searchResult += matches.size() + " of " + matches.size();
-                mEditor.setSelection(matches.get(matches.size() - 1).first,
-                        matches.get(matches.size() - 1).first + matches.get(matches.size() - 1).second);
-            } else {
-                searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start(),
-                        mMatcher.end() - mMatcher.start())) + 1);
-                searchResult += " of " + matches.size();
-            }
+            searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start(),
+                    mMatcher.end() - mMatcher.start())) + 1);
+            searchResult += " of " + matches.size();
             mSearchResults.setText(searchResult);
         }
     }
@@ -1066,47 +1061,53 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         Pattern mPattern;
         Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
+        Boolean matchFound = false;
 
         search = mSearchInput.getText().toString();
         text = mEditor.getText().toString();
-        selection = mEditor.getSelectionStart() - 1;
+        selection = mEditor.getSelectionStart() == 0 ? mEditor.getSelectionStart() :
+                mEditor.getSelectionStart() - 1;
 
         //Check search input is empty!
         if (search.length() == 0) {
             Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
             return;
         }
+
         mPattern = createSearchPattern(search);
         if (mPattern == null) return;
+
         mMatcher = mPattern.matcher(text);
-        mMatcher = mMatcher.region(0, selection == -1 ? 0 : selection);
+        mMatcher = mMatcher.region(0, selection);
 
-
-        matches = checkAllMatches(text,mPattern);
+        matches = checkAllMatches(text, mPattern);
 
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
+            matchFound = true;
         }
-        if (prev == -1) {
+        if (!matchFound) {
+            mMatcher = mMatcher.region(selection, text.length());
+            while (mMatcher.find()) {
+                prev = mMatcher.start();
+                size = mMatcher.end() - mMatcher.start();
+                matchFound = true;
+            }
+        }
+        if (!matchFound)
             Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
-        } else {
+        else {
             mEditor.setSelection(prev, prev + size);
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
         }
 
-        if (matches.size() == 0) mSearchResults.setText(R.string.ui_search_no_matches);
+        if (!matchFound) mSearchResults.setText(R.string.ui_search_no_matches);
         else {
             String searchResult = "";
-            if (prev == -1) {
-                searchResult += 1 + " of " + matches.size();
-                mEditor.setSelection(matches.get(0).first, matches.get(0).first + matches.get(0).second);
-            } else {
-                searchResult += (matches.indexOf(new Pair<Integer, Integer>(prev,
-                        size)) + 1);
-                searchResult += " of " + matches.size();
-            }
+            searchResult += (matches.indexOf(new Pair<Integer, Integer>(prev, size)) + 1);
+            searchResult += " of " + matches.size();
             mSearchResults.setText(searchResult);
         }
     }
@@ -1177,13 +1178,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     *
-     * @param text text for checking
+     * @param text    text for checking
      * @param pattern regex pattern for cheking
      * @return Array of key pairs (start of match and the length of match)
      */
-    protected ArrayList<Pair<Integer,Integer>> checkAllMatches(CharSequence text, Pattern pattern){
-        ArrayList<Pair<Integer,Integer>> result  = new ArrayList<Pair<Integer, Integer>>();
+    protected ArrayList<Pair<Integer, Integer>> checkAllMatches(CharSequence text, Pattern pattern) {
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<Pair<Integer, Integer>>();
         Matcher mMatcher = pattern.matcher(text);
 
         while (mMatcher.find()) {
@@ -1202,26 +1202,25 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mInReplace = false;
         CharSequence replaceStr;
         CharSequence searchStr;
-        int start,end;
+        int start, end;
         replaceStr = mReplaceInput.getText().toString();
 
         start = mEditor.getSelectionStart();
         end = mEditor.getSelectionEnd();
-        if(start==end) {
+        if (start == end) {
             searchNext();
             start = mEditor.getSelectionStart();
             end = mEditor.getSelectionEnd();
         }
         searchStr = mEditor.getText().subSequence(start, end);
-        if(start!=end) {
+        if (start != end) {
             mInReplace = true;
             mEditor.getText().replace(start, end, replaceStr);
-            mWatcher.processReplace(replaceStr,searchStr,start);
-            mEditor.setSelection(start+replaceStr.length());
+            mWatcher.processReplace(replaceStr, searchStr, start);
+            mEditor.setSelection(start + replaceStr.length());
             searchNext();
             mInReplace = false;
-        }
-        else {
+        } else {
             Crouton.showText(this, R.string.toast_replace_not_found,
                     Style.INFO);
             mInReplace = false;
@@ -1249,20 +1248,17 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
         mPattern = createSearchPattern(searchStr.toString());
 
-        if(mPattern.matcher(textBefore).find()) {
+        if (mPattern.matcher(textBefore).find()) {
             mInReplace = true;
-            textAfter = textBefore.replaceAll(mPattern.pattern(),replaceStr.toString());
-            mEditor.getText().replace(0,mEditor.getText().length(),textAfter);
-            mWatcher.processReplace(textAfter,textBefore,0);
+            textAfter = textBefore.replaceAll(mPattern.pattern(), replaceStr.toString());
+            mEditor.getText().replace(0, mEditor.getText().length(), textAfter);
+            mWatcher.processReplace(textAfter, textBefore, 0);
             mInReplace = false;
-        }
-        else
+        } else
             Crouton.showText(this, R.string.toast_replace_not_found,
                     Style.INFO);
-            mInReplace = false;
+        mInReplace = false;
     }
-
-
 
 
     /**
