@@ -44,9 +44,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
                 android:src="@drawable/ic_find_next" />
-
-
-
         </TableRow>
 
         <TableRow>

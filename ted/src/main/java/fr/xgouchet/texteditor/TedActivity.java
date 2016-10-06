@@ -1011,7 +1011,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         String search, text;
         int selection;
         Pattern mPattern;
-        Matcher mMatcher, mSizeMatcher;
+        Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
 
 
@@ -1027,13 +1027,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mPattern = createSearchPattern(search);
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
-        mSizeMatcher = mPattern.matcher(text);
-        matches = new ArrayList<Pair<Integer, Integer>>();
 
-        while (mSizeMatcher.find()) {
-            matches.add(new Pair<Integer, Integer>(mSizeMatcher.start(),
-                    mSizeMatcher.end() - mSizeMatcher.start()));
-        }
+        matches = checkAllMatches(text,mPattern);
+
+
         if (!mMatcher.find(selection)) {
             Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
 
@@ -1066,7 +1063,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         String search, text;
         int selection, prev = -1, size = -1;
         Pattern mPattern;
-        Matcher mMatcher, mSizeMatcher;
+        Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
 
         search = mSearchInput.getText().toString();
@@ -1082,13 +1079,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
         mMatcher = mMatcher.region(0, selection == -1 ? 0 : selection);
-        mSizeMatcher = mPattern.matcher(text);
-        matches = new ArrayList<Pair<Integer, Integer>>();
 
-        while (mSizeMatcher.find()) {
-            matches.add(new Pair<Integer, Integer>(mSizeMatcher.start(),
-                    mSizeMatcher.end() - mSizeMatcher.start()));
-        }
+
+        matches = checkAllMatches(text,mPattern);
+
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
@@ -1179,6 +1173,24 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             return null;
         }
         return mPattern;
+    }
+
+    /**
+     *
+     * @param text text for checking
+     * @param pattern regex pattern for cheking
+     * @return Array of key pairs (start of match and the length of match)
+     */
+    protected ArrayList<Pair<Integer,Integer>> checkAllMatches(CharSequence text, Pattern pattern){
+        ArrayList<Pair<Integer,Integer>> result  = new ArrayList<Pair<Integer, Integer>>();
+        Matcher mMatcher = pattern.matcher(text);
+
+        while (mMatcher.find()) {
+            result.add(new Pair<Integer, Integer>(mMatcher.start(),
+                    mMatcher.end() - mMatcher.start()));
+        }
+
+    return result;
     }
 
     /**
