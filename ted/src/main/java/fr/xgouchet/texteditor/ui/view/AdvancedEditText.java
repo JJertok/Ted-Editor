@@ -315,7 +315,7 @@ public class AdvancedEditText extends EditText implements Constants,
 			setTextColor(Color.BLACK);
 			mPaintHighlight.setColor(Color.BLACK);
 			mPaintNumbers.setColor(Color.GRAY);
-			mPaintHighlightLine.setColor(Color.rgb(251,194,0));
+			mPaintHighlightLine.setColor(Color.BLACK);
 			break;
 		}
 		mPaintHighlight.setAlpha(48);
@@ -404,6 +404,8 @@ public class AdvancedEditText extends EditText implements Constants,
 			if(i < 0 || i >= count) continue;
 			position = (i/(float)count) * height + mDrawingRect.top;
 			canvas.drawLine(canvas.getWidth() + mDrawingRect.left - 20, position, canvas.getWidth() + mDrawingRect.left , position, mPaintHighlightLine);
+			canvas.drawLine(canvas.getWidth() + mDrawingRect.left - 20, position + 1, canvas.getWidth() + mDrawingRect.left , position + 1, mPaintHighlightLine);
+			canvas.drawLine(canvas.getWidth() + mDrawingRect.left - 20, position + 2, canvas.getWidth() + mDrawingRect.left , position + 2, mPaintHighlightLine);
 		}
 	}
 
