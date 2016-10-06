@@ -1202,13 +1202,20 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         CharSequence searchStr;
         int start,end;
         replaceStr = mReplaceInput.getText().toString();
+
         start = mEditor.getSelectionStart();
         end = mEditor.getSelectionEnd();
+        if(start==end) {
+            searchNext();
+            start = mEditor.getSelectionStart();
+            end = mEditor.getSelectionEnd();
+        }
         searchStr = mEditor.getText().subSequence(start, end);
         if(start!=end) {
             mInReplace = true;
             mEditor.getText().replace(start, end, replaceStr);
             mWatcher.processReplace(replaceStr,searchStr,start);
+            mEditor.setSelection(start+replaceStr.length());
             searchNext();
             mInReplace = false;
         }
