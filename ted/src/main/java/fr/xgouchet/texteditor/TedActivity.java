@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,24 +26,29 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -57,12 +61,14 @@ import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
 import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
+import fr.xgouchet.texteditor.ui.listener.ButtonPanelListener;
+import fr.xgouchet.texteditor.ui.listener.OnKeyboardVisibilityListener;
 import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
-        OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener {
+        OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
 
     /**
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -100,6 +106,17 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mWholeWord = (CheckBox) findViewById(R.id.checkBoxWholeWord);
         mSearchResults = (TextView) findViewById(R.id.textViewSearchResult);
 
+        //Buttons with symbols on additional panel
+        findViewById(R.id.extraSymbButton1).setOnTouchListener( new ButtonPanelListener(1, mEditor));
+        findViewById(R.id.extraSymbButton2).setOnTouchListener( new ButtonPanelListener(2, mEditor));
+        findViewById(R.id.extraSymbButton3).setOnTouchListener( new ButtonPanelListener(3, mEditor));
+        findViewById(R.id.extraSymbButton4).setOnTouchListener( new ButtonPanelListener(4, mEditor));
+        findViewById(R.id.extraSymbButton5).setOnTouchListener( new ButtonPanelListener(5, mEditor));
+        findViewById(R.id.extraSymbButton6).setOnTouchListener( new ButtonPanelListener(6, mEditor));
+        findViewById(R.id.extraSymbButton7).setOnTouchListener( new ButtonPanelListener(7, mEditor));
+        findViewById(R.id.extraSymbButton8).setOnTouchListener( new ButtonPanelListener(8, mEditor));
+
+
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
         findViewById(R.id.buttonSearchPrev).setOnClickListener(this);
 
@@ -108,6 +125,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         findViewById(R.id.buttonReplace).setOnClickListener(this);
         findViewById(R.id.buttonReplaceAll).setOnClickListener(this);
         mUseRegex.setOnCheckedChangeListener(this);
+
+        //Check Keyboard visibility
+        setKeyboardVisibilityListener(this);
     }
 
     protected void initHighlighter() {
@@ -120,7 +140,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             e.printStackTrace();
         }
     }
-
 
     /**
      * @see android.app.Activity#onStart()
@@ -257,8 +276,13 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (BuildConfig.DEBUG)
+        //if (BuildConfig.DEBUG)
             Log.d(TAG, "onConfigurationChanged");
+        if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_NO) {
+            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard0");
+        } else if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES) {
+            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard_yes");
+        }
     }
 
     /**
@@ -1302,6 +1326,52 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         runAfterSave();
     }
 
+
+    /**
+     * Keyboard Visibility listener
+     * @param onKeyboardVisibilityListener
+     */
+    private void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
+        final View parentView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        parentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+            private boolean alreadyOpen;
+            private final int defaultKeyboardHeightDP = 100;
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN? 48 : 0);
+            private final Rect rect = new Rect();
+
+            @Override
+            public void onGlobalLayout() {
+                int estimatedKeyboardHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP, parentView.getResources().getDisplayMetrics());
+                parentView.getWindowVisibleDisplayFrame(rect);
+                int heightDiff = parentView.getRootView().getHeight() - (rect.bottom - rect.top);
+                boolean isShown = heightDiff >= estimatedKeyboardHeight;
+
+                if (isShown == alreadyOpen) {
+                    Log.i("Keyboard state", "Ignoring global layout change...");
+                    return;
+                }
+                alreadyOpen = isShown;
+                onKeyboardVisibilityListener.onVisibilityChanged(isShown);
+            }
+        });
+    }
+
+
+    /**
+     * Hide the additional button panel when keyboard is hide
+     * and show when keyboard displayed
+     */
+    @Override
+    public void onVisibilityChanged(boolean visible) {
+        if(visible){
+            findViewById(R.id.buttonLayout).setVisibility(View.VISIBLE);
+        }else{
+            findViewById(R.id.buttonLayout).setVisibility(View.GONE);
+        }
+    }
+
+
     /**
      * Update the window title
      */
@@ -1466,5 +1536,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * are we in a post activity result ?
      */
     protected boolean mReadIntent;
+
+    /**
+     * the keyboard layout root
+     */
+    protected View mButtonLayout;
+    /**
+     * Additional button coord
+     */
+    protected boolean mIsDown;
+    protected float mPreviousX;
+    protected float mPreviousY;
 
 }

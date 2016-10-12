@@ -8,7 +8,7 @@
         android:id="@+id/editor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="0.81"
         android:gravity="top|left"
         android:inputType="textMultiLine"
         android:scrollbarAlwaysDrawHorizontalTrack="true"
@@ -27,5 +27,77 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         layout="@layout/search" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonLayout">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button1"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton2"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button2"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton3"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button3"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton4"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button4"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton5"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button5"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton6"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button6"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton7"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button7"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/extraSymbButton8"
+            android:layout_weight="1"
+            style="@style/ButtonSmall"
+            android:src="@drawable/extra_symb_button8"/>
+
+    </LinearLayout>
 
 </LinearLayout>
