@@ -58,6 +58,8 @@ public class Settings implements Constants {
 	public static boolean USE_HOME_PAGE = false;
 	/** Home Page Path */
 	public static String HOME_PAGE_PATH = "";
+	/** Cursor for Last File */
+	public static int LAST_CURSOR = 0;
 
 	/**
 	 * @return the end of line characters according to the current settings
@@ -112,6 +114,7 @@ public class Settings implements Constants {
 
 		USE_HOME_PAGE = settings.getBoolean(PREFERENCE_USE_HOME_PAGE, false);
 		HOME_PAGE_PATH = settings.getString(PREFERENCE_HOME_PAGE_PATH, "");
+		LAST_CURSOR = settings.getInt(PREFERENCE_CURSOR, 0);
 
 		RecentFiles.loadRecentFiles(settings.getString(PREFERENCE_RECENTS, ""));
 	}

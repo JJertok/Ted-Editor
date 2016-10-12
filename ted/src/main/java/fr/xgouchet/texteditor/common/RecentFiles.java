@@ -8,6 +8,10 @@ import fr.xgouchet.texteditor.BuildConfig;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
+import android.view.ViewDebug;
+
+import static android.text.Selection.getSelectionStart;
+import static fr.xgouchet.texteditor.common.Settings.LAST_CURSOR;
 
 /**
  * Storage for a recent files list
@@ -92,6 +96,15 @@ public class RecentFiles implements Constants {
 	public static void removePath(String path) {
 		if (PATHS.contains(path)) {
 			PATHS.remove(path);
+		}
+	}
+
+	public static String getLastPath(){
+		if (PATHS.size()>0) {
+			return PATHS.get(0);
+		}
+		else{
+			return "NoFiles";
 		}
 	}
 

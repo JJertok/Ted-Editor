@@ -1,11 +1,13 @@
 package fr.xgouchet.texteditor;
 
+import static android.text.Selection.getSelectionStart;
 import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
 import static fr.xgouchet.androidlib.ui.Toaster.showToast;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemAsAction;
+import static fr.xgouchet.texteditor.common.RecentFiles.getLastPath;
 
 import java.io.File;
 import java.io.IOException;
@@ -202,6 +204,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             else if (Settings.AUTO_SAVE_OVERWRITE)
                 doSaveFile(mCurrentFilePath);
         }
+
+        saveCursor(getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE));
     }
 
     /**
@@ -589,7 +593,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                         Style.ALERT);
             } else {
                 loaded = doOpenFile(file, false);
+
             }
+        } else {
+            loaded = openLastFile();
         }
 
         if (!loaded)
@@ -947,6 +954,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Quit the app (user pressed back)
      */
     protected void quit() {
+        saveCursor(getSharedPreferences(PREFERENCES_NAME, MODE_PRIVATE));
         mAfterSave = new Runnable() {
             public void run() {
                 finish();
@@ -1336,6 +1344,47 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             mWholeWord.setEnabled(false);
             mWholeWord.setChecked(false);
         } else mWholeWord.setEnabled(true);
+    }
+
+    /**
+     * Open last saved file at start application
+     */
+    public boolean openLastFile(){
+        String last_path = getLastPath();
+
+        if (last_path == "NoFiles") return false;
+
+        doOpenFile(new File(last_path), false);
+        setCursor(Settings.LAST_CURSOR);
+        return true;
+    }
+
+    /**
+     * Get current position in text
+     */
+    public int getPosStart(){
+        return mEditor.getSelectionStart();
+    }
+
+    /**
+     * Write position into preferences
+     */
+    public void saveCursor(SharedPreferences prefs){
+        SharedPreferences.Editor editor;
+
+        editor = prefs.edit();
+        int selSt = getPosStart();
+
+        editor.putInt(Settings.PREFERENCE_CURSOR, selSt);
+        editor.commit();
+    }
+
+    /**
+     * Set position in selectionSt
+     */
+    public void setCursor(int posStart) {
+        if(mEditor.length() < posStart) return;
+        mEditor.setSelection(posStart, posStart);
     }
 
     /**

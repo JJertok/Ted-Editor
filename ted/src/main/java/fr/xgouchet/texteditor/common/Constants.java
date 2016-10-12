@@ -102,6 +102,11 @@ public interface Constants {
 	public static final String PREFERENCE_SELECT_FONT = "select_font";
 	/** Preference tag to the text font ( = {@value} ) */
 	public static final String PREFERENCE_FONT = "text_font";
+	/** Preference tag to retrieve the home page path ( = {@value} ) */
+	public static final String PREFERENCE_LAST_FILE_PATH = "last_file_path";
+
+	/** Preference tag to retrieve the cursor for last file ( = {@value} ) */
+	public static final String PREFERENCE_CURSOR = "last_cursor";
 
 	/** minimum text size */
 	public static final int TEXT_SIZE_MIN = 9;
