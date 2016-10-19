@@ -60,6 +60,7 @@
     <string name="menu_search">Hľadať</string>
     <string name="menu_undo">Krok späť</string>
     <string name="menu_redo">Prerobiť</string>
+    <string name="menu_share">Deliti</string>
     <string name="menu_quit">Ukončiť</string>
 
     <!-- Misc UI strings -->

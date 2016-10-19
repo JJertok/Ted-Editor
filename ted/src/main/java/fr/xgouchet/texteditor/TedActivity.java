@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
@@ -48,7 +47,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -323,6 +321,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         addMenuItem(menu, MENU_ID_SEARCH, R.string.menu_search,
                 R.drawable.ic_menu_search);
 
+        addMenuItem(menu, MENU_ID_SHARE, R.string.menu_share,
+                R.drawable.ic_menu_share);
+
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
@@ -346,6 +347,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         showMenuItemAsAction(menu.findItem(MENU_ID_SEARCH),
                 R.drawable.ic_menu_search);
+
 
         return true;
     }
@@ -373,6 +375,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
             case MENU_ID_SEARCH:
                 search();
+                break;
+            case MENU_ID_SHARE:
+                share();
                 break;
             case MENU_ID_SETTINGS:
                 settingsActivity();
@@ -1033,6 +1038,19 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 mEditor.clearHighlightLines();
                 break;
         }
+    }
+
+    /**
+     * Opens / close the search interface
+     */
+    protected void share() {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "share");
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, mEditor.getText().toString());
+        sendIntent.setType("text/plain/file/audio/video");
+        startActivity(sendIntent);
     }
 
     /**
