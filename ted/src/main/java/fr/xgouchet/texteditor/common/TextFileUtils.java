@@ -9,190 +9,234 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 
 import fr.xgouchet.texteditor.BuildConfig;
+
 import org.mozilla.universalchardet.UniversalDetector;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
 /**
  * Misc file utilities
- * 
+ * <p>
  * TODO code review
- * 
  */
 public class TextFileUtils implements Constants {
 
-	/**
-	 * @param path
-	 *            the absolute path to the file to save
-	 * @param text
-	 *            the text to write
-	 * @return if the file was saved successfully
-	 */
-	public static boolean writeTextFile(String path, String text) {
-		File file = new File(path);
-		OutputStreamWriter writer;
-		FileOutputStream stream;
-		BufferedWriter out;
-		String eol_text = text;
-		try {
-			if (Settings.END_OF_LINE != EOL_LINUX) {
-				eol_text = eol_text.replaceAll("\n", Settings.getEndOfLine());
-			}
+    /**
+     * @param path the absolute path to the file to save
+     * @param text the text to write
+     * @return if the file was saved successfully
+     */
+    public static boolean writeTextFile(String path, String text) {
+        File file = new File(path);
+        OutputStreamWriter writer;
+        FileOutputStream stream;
+        BufferedWriter out;
+        String eol_text = text;
+        try {
+            if (Settings.END_OF_LINE != EOL_LINUX) {
+                eol_text = eol_text.replaceAll("\n", Settings.getEndOfLine());
+            }
 
-			stream = new FileOutputStream(file);
-			writer = new OutputStreamWriter(stream, Settings.ENCODING);
-			out = new BufferedWriter(writer);
-			out.write(eol_text);
-			out.flush();
-			stream.getFD().sync();
-			out.close();
-		} catch (OutOfMemoryError e) {
-			Log.w(TAG, "Out of memory error", e);
-			return false;
-		} catch (IOException e) {
-			Log.w(TAG, "Can't write to file " + path, e);
-			return false;
-		}
-		return true;
-	}
+            stream = new FileOutputStream(file);
+            writer = new OutputStreamWriter(stream, Settings.ENCODING);
+            out = new BufferedWriter(writer);
+            out.write(eol_text);
+            out.flush();
+            stream.getFD().sync();
+            out.close();
+        } catch (OutOfMemoryError e) {
+            Log.w(TAG, "Out of memory error", e);
+            return false;
+        } catch (IOException e) {
+            Log.w(TAG, "Can't write to file " + path, e);
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * @param file
-	 *            the file to read
-	 * @return the content of the file as text
-	 */
-	public static String readTextFile(File file) {
-		InputStreamReader reader;
-		BufferedReader in;
-		StringBuffer text = new StringBuffer();
-		int c;
-		try {
-			String charset = fr.xgouchet.androidlib.data.TextFileUtils.getFileEncoding(file);
-			reader = new InputStreamReader(new FileInputStream(file), charset);
-			in = new BufferedReader(reader);
-			do {
-				c = in.read();
-				if (c != -1) {
-					text.append((char) c);
-				}
-			} while (c != -1);
-			in.close();
-		} catch (IOException e) {
-			Log.w(TAG, "Can't read file " + file.getName(), e);
-			return null;
-		} catch (OutOfMemoryError e) {
-			Log.w(TAG, "File is to big to read", e);
-			return null;
-		}
+    /**
+     * @param file the file to read
+     * @return the content of the file as text
+     */
+    public static String readTextFile(File file) {
+        FileInputStream reader;
+        BufferedReader in;
+        String text = "";
+        MappedByteBuffer mappedByteBuffer;
+        FileChannel fch = null;
+        try {
+            String charset = fr.xgouchet.androidlib.data.TextFileUtils.getFileEncoding(file);
+            reader = new FileInputStream(file);
+            fch = reader.getChannel();
+            mappedByteBuffer = fch.map(FileChannel.MapMode.READ_ONLY, 0, fch.size());
+            CharBuffer charBuffer = Charset.forName(charset).decode(mappedByteBuffer);
+            text = charBuffer.toString();
 
-		// detect end of lines
-		String content = text.toString();
-		int windows = content.indexOf("\r\n");
-		int macos = content.indexOf("\r");
+            fch.close();
+            reader.close();
+        } catch (IOException e) {
+            Log.w(TAG, "Can't read file " + file.getName(), e);
+            return null;
+        } catch (OutOfMemoryError e) {
+            Log.w(TAG, "File is to big to read", e);
+            return null;
+        }
 
-		if (windows != -1) {
-			Settings.END_OF_LINE = EOL_WINDOWS;
-			content = content.replaceAll("\r\n", "\n");
-		} else {
-			if (macos != -1) {
-				Settings.END_OF_LINE = EOL_MAC;
-				content = content.replaceAll("\r", "\n");
-			} else {
-				Settings.END_OF_LINE = EOL_LINUX;
-			}
-		}
 
-		if (BuildConfig.DEBUG) {
-			Log.d(TAG, "Using End of Line : " + Settings.END_OF_LINE);
-		}
-		return content;
-	}
+        // detect end of lines
+        String content = text;
+        int windows = content.indexOf("\r\n");
+        int macos = content.indexOf("\r");
 
-	/**
-	 * @param context
-	 *            the current context
-	 * @param text
-	 *            the text to write
-	 * @return if the file was saved successfully
-	 */
-	public static boolean writeInternal(Context context, String text) {
-		FileOutputStream fos;
-		try {
-			fos = context
-					.openFileOutput(BACKUP_FILE_NAME, Context.MODE_PRIVATE);
-			fos.write(text.getBytes());
-			fos.close();
-			if (BuildConfig.DEBUG) {
-				Log.i(TAG, "Saved to file " + context.getFilesDir().getPath()
-						+ File.separator + BACKUP_FILE_NAME);
-			}
-		} catch (FileNotFoundException e) {
-			Log.w(TAG, "Couldn't write to internal storage ", e);
-			return false;
-		} catch (IOException e) {
-			Log.w(TAG, "Error occured while writing to internal storage ", e);
-			return false;
-		}
-		return true;
-	}
+        if (windows != -1) {
+            Settings.END_OF_LINE = EOL_WINDOWS;
+            content = content.replaceAll("\r\n", "\n");
+        } else {
+            if (macos != -1) {
+                Settings.END_OF_LINE = EOL_MAC;
+                content = content.replaceAll("\r", "\n");
+            } else {
+                Settings.END_OF_LINE = EOL_LINUX;
+            }
+        }
 
-	/**
-	 * @param context
-	 *            the current context
-	 * @return the content of the file as text
-	 */
-	public static String readInternal(Context context) {
-		FileInputStream fis;
-		StringBuffer text = new StringBuffer();
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "Using End of Line : " + Settings.END_OF_LINE);
+        }
+        return content;
+    }
+//	public static String readTextFile(File file) {
+//		InputStreamReader reader;
+//		BufferedReader in;
+//		StringBuffer text = new StringBuffer();
+//		int c;
+//		try {
+//			String charset = fr.xgouchet.androidlib.data.TextFileUtils.getFileEncoding(file);
+//			reader = new InputStreamReader(new FileInputStream(file), charset);
+//			in = new BufferedReader(reader);
+//			do {
+//				c = in.read();
+//				if (c != -1) {
+//					text.append((char) c);
+//				}
+//			} while (c != -1);
+//			in.close();
+//		} catch (IOException e) {
+//			Log.w(TAG, "Can't read file " + file.getName(), e);
+//			return null;
+//		} catch (OutOfMemoryError e) {
+//			Log.w(TAG, "File is to big to read", e);
+//			return null;
+//		}
+//
+//		// detect end of lines
+//		String content = text.toString();
+//		int windows = content.indexOf("\r\n");
+//		int macos = content.indexOf("\r");
+//
+//		if (windows != -1) {
+//			Settings.END_OF_LINE = EOL_WINDOWS;
+//			content = content.replaceAll("\r\n", "\n");
+//		} else {
+//			if (macos != -1) {
+//				Settings.END_OF_LINE = EOL_MAC;
+//				content = content.replaceAll("\r", "\n");
+//			} else {
+//				Settings.END_OF_LINE = EOL_LINUX;
+//			}
+//		}
+//
+//		if (BuildConfig.DEBUG) {
+//			Log.d(TAG, "Using End of Line : " + Settings.END_OF_LINE);
+//		}
+//		return content;
+//	}
 
-		try {
-			fis = context.openFileInput(BACKUP_FILE_NAME);
-			while (fis.available() > 0) {
-				text.append((char) fis.read());
-			}
-		} catch (FileNotFoundException e) {
-			Log.w(TAG, "No backup file available", e);
-			return null;
-		} catch (IOException e) {
-			Log.w(TAG, "Can't read backup file ", e);
-			return null;
-		}
-		return text.toString();
-	}
+    /**
+     * @param context the current context
+     * @param text    the text to write
+     * @return if the file was saved successfully
+     */
+    public static boolean writeInternal(Context context, String text) {
+        FileOutputStream fos;
+        try {
+            fos = context
+                    .openFileOutput(BACKUP_FILE_NAME, Context.MODE_PRIVATE);
+            fos.write(text.getBytes());
+            fos.close();
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, "Saved to file " + context.getFilesDir().getPath()
+                        + File.separator + BACKUP_FILE_NAME);
+            }
+        } catch (FileNotFoundException e) {
+            Log.w(TAG, "Couldn't write to internal storage ", e);
+            return false;
+        } catch (IOException e) {
+            Log.w(TAG, "Error occured while writing to internal storage ", e);
+            return false;
+        }
+        return true;
+    }
 
-	/**
-	 * @param context
-	 *            the current context
-	 */
-	public static void clearInternal(Context context) {
-		writeInternal(context, "");
-	}
-	
-	/**
-	 * Detect charset
-	 * @see    https://code.google.com/p/juniversalchardet/
-	 * @param  fileName
-	 *             the absolute path of the file to open
-	 * @return charset name
-	 *         
-	 * */
-	public static String detectCharSet(String fileName) throws IOException {
-	    byte[] buf = new byte[4096];
-	    FileInputStream fis = new FileInputStream(fileName);
-	    UniversalDetector detector = new UniversalDetector(null);
+    /**
+     * @param context the current context
+     * @return the content of the file as text
+     */
+    public static String readInternal(Context context) {
+        FileInputStream fis;
+        StringBuffer text = new StringBuffer();
 
-	    int nread;
-	    while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
-	      detector.handleData(buf, 0, nread);
-	    }
-	    detector.dataEnd();
+        try {
+            fis = context.openFileInput(BACKUP_FILE_NAME);
+            while (fis.available() > 0) {
+                text.append((char) fis.read());
+            }
+        } catch (FileNotFoundException e) {
+            Log.w(TAG, "No backup file available", e);
+            return null;
+        } catch (IOException e) {
+            Log.w(TAG, "Can't read backup file ", e);
+            return null;
+        }
+        return text.toString();
+    }
 
-	    String encoding = detector.getDetectedCharset();
+    /**
+     * @param context the current context
+     */
+    public static void clearInternal(Context context) {
+        writeInternal(context, "");
+    }
 
-	    detector.reset();
-	    return encoding;
-	  }
+    /**
+     * Detect charset
+     *
+     * @param fileName the absolute path of the file to open
+     * @return charset name
+     * @see https://code.google.com/p/juniversalchardet/
+     */
+    public static String detectCharSet(String fileName) throws IOException {
+        byte[] buf = new byte[4096];
+        FileInputStream fis = new FileInputStream(fileName);
+        UniversalDetector detector = new UniversalDetector(null);
+
+        int nread;
+        while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
+            detector.handleData(buf, 0, nread);
+        }
+        detector.dataEnd();
+
+        String encoding = detector.getDetectedCharset();
+
+        detector.reset();
+        return encoding;
+    }
 }

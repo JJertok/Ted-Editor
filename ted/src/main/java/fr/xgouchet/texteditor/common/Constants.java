@@ -113,6 +113,8 @@ public interface Constants {
 	/** maximum text size */
 	public static final int TEXT_SIZE_MAX = 40;
 
+	public static final int LINES_PER_PAGE = 300;
+
 	/** End of line setting for Linux files ( = {@value} ) */
 	public static final int EOL_LINUX = 0;
 	/** End of line setting for Windows files ( = {@value} ) */

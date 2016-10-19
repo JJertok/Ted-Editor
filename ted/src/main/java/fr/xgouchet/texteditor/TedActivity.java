@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +35,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -55,6 +57,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import de.neofonie.mobile.app.android.widget.crouton.Crouton;
 import de.neofonie.mobile.app.android.widget.crouton.Style;
 import fr.xgouchet.texteditor.common.Constants;
+import fr.xgouchet.texteditor.common.PageSystem;
 import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
@@ -86,6 +89,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         highlighter = new Highlighter();
         tokenReader = new TokenReader();
+        mPageSystem = new PageSystem("");
 
         initHighlighter();
         // editor
@@ -97,6 +101,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mWatcher = new TextChangeWatcher();
         mWarnedShouldQuit = false;
         mDoNotBackup = false;
+
+        // pages
+        findViewById(R.id.buttonNextPage).setOnClickListener(this);
+        findViewById(R.id.buttonPrevPage).setOnClickListener(this);
 
         // search
         mSearchLayout = findViewById(R.id.searchLayout);
@@ -276,13 +284,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        //if (BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG)
             Log.d(TAG, "onConfigurationChanged");
-        if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_NO) {
-            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard0");
-        } else if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES) {
-            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard_yes");
-        }
+
     }
 
     /**
@@ -404,11 +408,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     public void beforeTextChanged(CharSequence s, int start, int count,
                                   int after) {
+
         beforeLength = s.length();
-        if ((Settings.REDO && (!mInRedo) &&
-                Settings.UNDO && (!mInUndo) &&
-                (!mInReplace))
-                && (mWatcher != null))
+        if ((Settings.REDO && (!mInRedo) && Settings.UNDO && (!mInUndo) &&
+                (!mInReplace)) && (!mInPageChange) && (mWatcher != null))
             mWatcher.beforeChange(s, start, count, after);
     }
 
@@ -417,7 +420,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (mInUndo || mInRedo || mInBrackets || mInReplace)
+        if (mInUndo || mInRedo || mInBrackets || mInReplace || mInPageChange)
             return;
         boolean bracketsChanged = true;
 
@@ -479,6 +482,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
      */
     public void afterTextChanged(Editable s) {
+
         if (Settings.HIGHLIGHT_SYNTAX) {
             updateHightlightSettings();
             highlighter.highlight(s);
@@ -529,6 +533,13 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void onClick(View v) {
         mWarnedShouldQuit = false;
         switch (v.getId()) {
+
+            case R.id.buttonNextPage:
+                nextPage();
+                break;
+            case R.id.buttonPrevPage:
+                prevPage();
+                break;
             case R.id.buttonSearchNext:
                 searchNext();
                 break;
@@ -634,7 +645,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected void doClearContents() {
         mWatcher = null;
         mInUndo = true;
-        mEditor.setText("");
+        mPageSystem = new PageSystem("");
+        mEditor.setText(mPageSystem.getCurrentPageText());
         mCurrentFilePath = null;
         mCurrentFileName = null;
         Settings.END_OF_LINE = Settings.DEFAULT_END_OF_LINE;
@@ -671,7 +683,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             text = TextFileUtils.readTextFile(file);
             if (text != null) {
                 mInUndo = true;
-                mEditor.setText(text);
+                mPageSystem = new PageSystem(text);
+                mEditor.setText(mPageSystem.getCurrentPageText());
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = getCanonizePath(file);
                 mCurrentFileName = file.getName();
@@ -715,6 +728,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             text = TextFileUtils.readInternal(this);
             if (!TextUtils.isEmpty(text)) {
                 mInUndo = true;
+                mPageSystem = new PageSystem(text);
                 mEditor.setText(text);
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = null;
@@ -1015,6 +1029,37 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         } catch (ActivityNotFoundException e) {
             Crouton.showText(this, R.string.toast_activity_save_as, Style.ALERT);
         }
+    }
+
+    protected void addPage() {
+        mPageSystem.addPage("");
+        this.nextPage();
+    }
+
+    protected void nextPage() {
+        mInPageChange = true;
+        if (!mPageSystem.canReadNextPage())
+            Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
+        else {
+            mPageSystem.savePage(mEditor.getText().toString());
+            mPageSystem.nextPage();
+            mEditor.updateLineNumber(mPageSystem.getStartingLine());
+            mEditor.setText(mPageSystem.getCurrentPageText());
+        }
+        mInPageChange = false;
+    }
+
+    protected void prevPage() {
+        mInPageChange = true;
+        if (!mPageSystem.canReadPrevPage())
+            Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
+        else {
+            mPageSystem.savePage(mEditor.getText().toString());
+            mPageSystem.prevPage();
+            mEditor.updateLineNumber(mPageSystem.getStartingLine());
+            mEditor.setText(mPageSystem.getCurrentPageText());
+        }
+        mInPageChange = false;
     }
 
     /**
@@ -1416,6 +1461,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         } else mWholeWord.setEnabled(true);
     }
 
+
     /**
      * Open last saved file at start application
      */
@@ -1462,8 +1508,17 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected AdvancedEditText mEditor;
     /**
+     * text editor pages
+     */
+    protected PageSystem mPageSystem;
+    /**
+     * Pages changes flag for ignoring undo/redo options
+     */
+    protected boolean mInPageChange;
+    /**
      * the path of the file currently opened
      */
+
     protected String mCurrentFilePath;
     /**
      * the name of the file currently opened
@@ -1511,7 +1566,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected TextView mSearchResults;
 
     /**
-     * Undo watcher
+     * Undo/Redo watcher
      */
     protected TextChangeWatcher mWatcher;
     protected boolean mInUndo;
@@ -1536,6 +1591,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * are we in a post activity result ?
      */
     protected boolean mReadIntent;
+
 
     /**
      * the keyboard layout root
