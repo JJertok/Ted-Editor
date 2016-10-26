@@ -1,6 +1,5 @@
 package fr.xgouchet.texteditor;
 
-import static android.text.Selection.getSelectionStart;
 import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
@@ -14,7 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.regex.MatchResult;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,14 +28,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.BackgroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
@@ -49,6 +47,7 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,8 +69,14 @@ import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
+import com.software.shell.fab.ActionButton;
+
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
+
+
+    //TODO Fix undo\redo operations with multipage system
+
 
     /**
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -96,6 +101,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mEditor = (AdvancedEditText) findViewById(R.id.editor);
 
         mEditor.addTextChangedListener(this);
+        mEditor.setOnClickListener(this);
         mEditor.addUpdateSetting(this);
         mEditor.updateFromSettings();
         mWatcher = new TextChangeWatcher();
@@ -103,8 +109,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mDoNotBackup = false;
 
         // pages
-        findViewById(R.id.buttonNextPage).setOnClickListener(this);
-        findViewById(R.id.buttonPrevPage).setOnClickListener(this);
+        mButtonNextPage = (ActionButton) findViewById(R.id.buttonNextPage);
+        mButtonNextPage.setOnClickListener(this);
+        mButtonPrevPage = (ActionButton) findViewById(R.id.buttonPrevPage);
+        mButtonPrevPage.setOnClickListener(this);
+        showPagesButton();
 
         // search
         mSearchLayout = findViewById(R.id.searchLayout);
@@ -115,14 +124,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mSearchResults = (TextView) findViewById(R.id.textViewSearchResult);
 
         //Buttons with symbols on additional panel
-        findViewById(R.id.extraSymbButton1).setOnTouchListener( new ButtonPanelListener(1, mEditor));
-        findViewById(R.id.extraSymbButton2).setOnTouchListener( new ButtonPanelListener(2, mEditor));
-        findViewById(R.id.extraSymbButton3).setOnTouchListener( new ButtonPanelListener(3, mEditor));
-        findViewById(R.id.extraSymbButton4).setOnTouchListener( new ButtonPanelListener(4, mEditor));
-        findViewById(R.id.extraSymbButton5).setOnTouchListener( new ButtonPanelListener(5, mEditor));
-        findViewById(R.id.extraSymbButton6).setOnTouchListener( new ButtonPanelListener(6, mEditor));
-        findViewById(R.id.extraSymbButton7).setOnTouchListener( new ButtonPanelListener(7, mEditor));
-        findViewById(R.id.extraSymbButton8).setOnTouchListener( new ButtonPanelListener(8, mEditor));
+        findViewById(R.id.extraSymbButton1).setOnTouchListener(new ButtonPanelListener(1, mEditor));
+        findViewById(R.id.extraSymbButton2).setOnTouchListener(new ButtonPanelListener(2, mEditor));
+        findViewById(R.id.extraSymbButton3).setOnTouchListener(new ButtonPanelListener(3, mEditor));
+        findViewById(R.id.extraSymbButton4).setOnTouchListener(new ButtonPanelListener(4, mEditor));
+        findViewById(R.id.extraSymbButton5).setOnTouchListener(new ButtonPanelListener(5, mEditor));
+        findViewById(R.id.extraSymbButton6).setOnTouchListener(new ButtonPanelListener(6, mEditor));
+        findViewById(R.id.extraSymbButton7).setOnTouchListener(new ButtonPanelListener(7, mEditor));
+        findViewById(R.id.extraSymbButton8).setOnTouchListener(new ButtonPanelListener(8, mEditor));
 
 
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
@@ -552,6 +561,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             case R.id.buttonReplaceAll:
                 replaceAll();
                 break;
+            case R.id.editor:
+                showPagesButton();
         }
     }
 
@@ -685,6 +696,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 mInUndo = true;
                 mPageSystem = new PageSystem(text);
                 mEditor.setText(mPageSystem.getCurrentPageText());
+                showPagesButton();
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = getCanonizePath(file);
                 mCurrentFileName = file.getName();
@@ -729,7 +741,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             if (!TextUtils.isEmpty(text)) {
                 mInUndo = true;
                 mPageSystem = new PageSystem(text);
-                mEditor.setText(text);
+                mEditor.setText(mPageSystem.getCurrentPageText());
+                showPagesButton();
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = null;
                 mCurrentFileName = null;
@@ -767,7 +780,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             return;
         }
 
-        content = mEditor.getText().toString();
+        mPageSystem.savePage(mEditor.getText().toString());
+        content = mPageSystem.getAllText(mEditor.getText().toString());
 
         if (!TextFileUtils.writeTextFile(path + ".tmp", content)) {
             Crouton.showText(this, R.string.toast_save_temp, Style.ALERT);
@@ -801,8 +815,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mDoNotBackup) {
             doClearContents();
         }
-
-        String text = mEditor.getText().toString();
+        mPageSystem.savePage(mEditor.getText().toString());
+        String text = mPageSystem.getAllText(mEditor.getText().toString());
         if (text.length() == 0)
             return;
 
@@ -1031,6 +1045,33 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
     }
 
+    protected void showPagesButton() {
+        if (mPageSystem.canReadNextPage())
+            mButtonNextPage.show();
+        else mButtonNextPage.hide();
+        if (mPageSystem.canReadPrevPage())
+            mButtonPrevPage.show();
+        else mButtonPrevPage.hide();
+
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mButtonNextPage.hide();
+                        mButtonPrevPage.hide();
+                    }
+                });
+            }
+        }, 3000);
+    }
+
     protected void addPage() {
         mPageSystem.addPage("");
         this.nextPage();
@@ -1038,27 +1079,33 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
     protected void nextPage() {
         mInPageChange = true;
-        if (!mPageSystem.canReadNextPage())
-            Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
-        else {
-            mPageSystem.savePage(mEditor.getText().toString());
-            mPageSystem.nextPage();
-            mEditor.updateLineNumber(mPageSystem.getStartingLine());
-            mEditor.setText(mPageSystem.getCurrentPageText());
-        }
+        mPageSystem.savePage(mEditor.getText().toString());
+        mPageSystem.nextPage();
+        mEditor.updateLineNumber(mPageSystem.getStartingLine());
+        mEditor.setText(mPageSystem.getCurrentPageText());
+        showPagesButton();
+        mEditor.setSelection(0);
         mInPageChange = false;
     }
 
     protected void prevPage() {
         mInPageChange = true;
-        if (!mPageSystem.canReadPrevPage())
-            Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
-        else {
-            mPageSystem.savePage(mEditor.getText().toString());
-            mPageSystem.prevPage();
-            mEditor.updateLineNumber(mPageSystem.getStartingLine());
-            mEditor.setText(mPageSystem.getCurrentPageText());
-        }
+        mPageSystem.savePage(mEditor.getText().toString());
+        mPageSystem.prevPage();
+        mEditor.updateLineNumber(mPageSystem.getStartingLine());
+        mEditor.setText(mPageSystem.getCurrentPageText());
+        showPagesButton();
+        mEditor.setSelection(mEditor.getText().length());
+        mInPageChange = false;
+    }
+
+    protected void goToPage(int page, boolean withSave) {
+        mInPageChange = true;
+        if (withSave) mPageSystem.savePage(mEditor.getText().toString());
+        mPageSystem.goToPage(page);
+        mEditor.updateLineNumber(mPageSystem.getStartingLine());
+        mEditor.setText(mPageSystem.getCurrentPageText());
+        mEditor.setSelection(0);
         mInPageChange = false;
     }
 
@@ -1086,11 +1133,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected void searchNext() {
 
         String search, text;
-        int selection;
+        int selection, i;
         Pattern mPattern;
         Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
-        Boolean matchFound = false;
+        Boolean matchFound;
 
         search = mSearchInput.getText().toString();
         text = mEditor.getText().toString();
@@ -1104,29 +1151,43 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mPattern = createSearchPattern(search);
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
-        matches = checkAllMatches(text, mPattern);
+        matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
 
         matchFound = mMatcher.find(selection);
+        i = mPageSystem.getCurrentPage();
 
-        if (!matchFound) {
-            mMatcher = mMatcher.region(0, mEditor.getSelectionStart() == 0 ?
-                    mEditor.getSelectionStart() : mEditor.getSelectionStart() - 1);
-            matchFound = mMatcher.find();
+        if (!matchFound && matches.size() != 0) {
+            i = mPageSystem.getCurrentPage() + 1;
+
+            while (i < mPageSystem.getMaxPage()) {
+                mMatcher = mPattern.matcher(mPageSystem.getPageText(i));
+                matchFound = mMatcher.find();
+                if (matchFound) break;
+                i++;
+            }
+            if (!matchFound) {
+                i = 0;
+                while (i <= mPageSystem.getCurrentPage()) {
+                    mMatcher = mPattern.matcher(mPageSystem.getPageText(i));
+                    matchFound = mMatcher.find();
+                    if (matchFound) break;
+                    i++;
+                }
+            }
         }
         if (matchFound) {
+            if (i != mPageSystem.getCurrentPage())
+                goToPage(i, true);
             mEditor.setSelection(mMatcher.start(), mMatcher.start() + (mMatcher.end() - mMatcher.start()));
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
-        } else Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
-
-        if (!matchFound) mSearchResults.setText(R.string.ui_search_no_matches);
-        else {
             String searchResult = "";
-            searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start(),
+            searchResult += (matches.indexOf(new Pair<Integer, Integer>(mMatcher.start() + mPageSystem.getPagesLength(0, i),
                     mMatcher.end() - mMatcher.start())) + 1);
             searchResult += " of " + matches.size();
             mSearchResults.setText(searchResult);
-        }
+        } else mSearchResults.setText(R.string.ui_search_no_matches);
+
     }
 
     /**
@@ -1134,7 +1195,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected void searchPrevious() {
         String search, text;
-        int selection, prev = -1, size = -1;
+        int selection, prev = -1, size = -1, i;
         Pattern mPattern;
         Matcher mMatcher;
         ArrayList<Pair<Integer, Integer>> matches;
@@ -1157,35 +1218,54 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mMatcher = mPattern.matcher(text);
         mMatcher = mMatcher.region(0, selection);
 
-        matches = checkAllMatches(text, mPattern);
+        matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
 
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
             matchFound = true;
         }
-        if (!matchFound) {
-            mMatcher = mMatcher.region(selection, text.length());
-            while (mMatcher.find()) {
-                prev = mMatcher.start();
-                size = mMatcher.end() - mMatcher.start();
-                matchFound = true;
+        i = mPageSystem.getCurrentPage();
+        if (!matchFound && matches.size() != 0) {
+            i = mPageSystem.getCurrentPage() - 1;
+            while (i >= 0) {
+                mMatcher = mPattern.matcher(mPageSystem.getPageText(i));
+                while (mMatcher.find()) {
+                    prev = mMatcher.start();
+                    size = mMatcher.end() - mMatcher.start();
+                    matchFound = true;
+                }
+                if (matchFound) break;
+                i--;
             }
-        }
-        if (!matchFound)
-            Crouton.showText(this, R.string.toast_search_eof, Style.INFO);
-        else {
-            mEditor.setSelection(prev, prev + size);
-            if (!mEditor.isFocused())
-                mEditor.requestFocus();
+
+            if (!matchFound) {
+                i = mPageSystem.getMaxPage();
+                while (i >= mPageSystem.getCurrentPage()) {
+                    mMatcher = mPattern.matcher(mPageSystem.getPageText(i));
+                    while (mMatcher.find()) {
+                        prev = mMatcher.start();
+                        size = mMatcher.end() - mMatcher.start();
+                        matchFound = true;
+                    }
+                    if (matchFound) break;
+                    i--;
+                }
+            }
         }
 
         if (!matchFound) mSearchResults.setText(R.string.ui_search_no_matches);
         else {
+            if (i != mPageSystem.getCurrentPage())
+                goToPage(i, true);
+            mEditor.setSelection(prev, prev + size);
+            if (!mEditor.isFocused())
+                mEditor.requestFocus();
             String searchResult = "";
-            searchResult += (matches.indexOf(new Pair<Integer, Integer>(prev, size)) + 1);
+            searchResult += (matches.indexOf(new Pair<Integer, Integer>(prev + mPageSystem.getPagesLength(0, i), size)) + 1);
             searchResult += " of " + matches.size();
             mSearchResults.setText(searchResult);
+
         }
     }
 
@@ -1293,7 +1373,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (start != end) {
             mInReplace = true;
             mEditor.getText().replace(start, end, replaceStr);
-            mWatcher.processReplace(replaceStr, searchStr, start);
+            // mWatcher.processReplace(replaceStr, searchStr, start);
             mEditor.setSelection(start + replaceStr.length());
             searchNext();
             mInReplace = false;
@@ -1314,10 +1394,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         CharSequence replaceStr;
         String textBefore, textAfter;
         Pattern mPattern;
+        int currentPage = mPageSystem.getCurrentPage();
 
         searchStr = mSearchInput.getText().toString();
         replaceStr = mReplaceInput.getText().toString();
-        textBefore = mEditor.getText().toString();
+        textBefore = mPageSystem.getAllText(mEditor.getText().toString());
 
         if (searchStr.length() == 0) {
             Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
@@ -1328,15 +1409,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern.matcher(textBefore).find()) {
             mInReplace = true;
             textAfter = textBefore.replaceAll(mPattern.pattern(), replaceStr.toString());
-            mEditor.getText().replace(0, mEditor.getText().length(), textAfter);
-            mWatcher.processReplace(textAfter, textBefore, 0);
+            mPageSystem = new PageSystem(textAfter);
+            if (currentPage == 0)
+                goToPage(currentPage, false);
+            //mWatcher.processReplace(textAfter, textBefore, 0);
             mInReplace = false;
         } else
             Crouton.showText(this, R.string.toast_replace_not_found,
                     Style.INFO);
         mInReplace = false;
     }
-
 
     /**
      * Opens the about activity
@@ -1374,6 +1456,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
     /**
      * Keyboard Visibility listener
+     *
      * @param onKeyboardVisibilityListener
      */
     private void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
@@ -1382,7 +1465,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
             private boolean alreadyOpen;
             private final int defaultKeyboardHeightDP = 100;
-            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN? 48 : 0);
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN ? 48 : 0);
             private final Rect rect = new Rect();
 
             @Override
@@ -1393,7 +1476,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
 
                 if (isShown == alreadyOpen) {
-                    Log.i("Keyboard state", "Ignoring global layout change...");
                     return;
                 }
                 alreadyOpen = isShown;
@@ -1409,9 +1491,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     @Override
     public void onVisibilityChanged(boolean visible) {
-        if(visible){
+        if (visible) {
             findViewById(R.id.buttonLayout).setVisibility(View.VISIBLE);
-        }else{
+        } else {
             findViewById(R.id.buttonLayout).setVisibility(View.GONE);
         }
     }
@@ -1465,33 +1547,36 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     /**
      * Open last saved file at start application
      */
-    public boolean openLastFile(){
+    public boolean openLastFile() {
         String last_path = getLastPath();
 
         if (last_path == "NoFiles") return false;
 
         doOpenFile(new File(last_path), false);
+        goToPage(Settings.LAST_PAGE, false);
         setCursor(Settings.LAST_CURSOR);
+
         return true;
     }
 
     /**
      * Get current position in text
      */
-    public int getPosStart(){
+    public int getPosStart() {
         return mEditor.getSelectionStart();
     }
 
     /**
      * Write position into preferences
      */
-    public void saveCursor(SharedPreferences prefs){
+    public void saveCursor(SharedPreferences prefs) {
         SharedPreferences.Editor editor;
 
         editor = prefs.edit();
         int selSt = getPosStart();
 
         editor.putInt(Settings.PREFERENCE_CURSOR, selSt);
+        editor.putInt(Settings.PREFERENCE_LAST_PAGE, mPageSystem.getCurrentPage());
         editor.commit();
     }
 
@@ -1499,8 +1584,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Set position in selectionSt
      */
     public void setCursor(int posStart) {
-        if(mEditor.length() < posStart) return;
-        mEditor.setSelection(posStart, posStart);
+        if (mEditor.length() < posStart) return;
+        mEditor.setSelection(posStart);
     }
 
     /**
@@ -1515,10 +1600,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Pages changes flag for ignoring undo/redo options
      */
     protected boolean mInPageChange;
+
+    /**
+     * Buttons, for changing the pages.
+     */
+    protected ActionButton mButtonNextPage;
+    protected ActionButton mButtonPrevPage;
+
     /**
      * the path of the file currently opened
      */
-
     protected String mCurrentFilePath;
     /**
      * the name of the file currently opened
@@ -1592,16 +1683,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected boolean mReadIntent;
 
-
     /**
-     * the keyboard layout root
+     * Timer for hiding floating button
      */
-    protected View mButtonLayout;
-    /**
-     * Additional button coord
-     */
-    protected boolean mIsDown;
-    protected float mPreviousX;
-    protected float mPreviousY;
-
+    protected Timer mTimer;
 }

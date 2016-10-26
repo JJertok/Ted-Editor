@@ -60,6 +60,8 @@ public class Settings implements Constants {
 	public static String HOME_PAGE_PATH = "";
 	/** Cursor for Last File */
 	public static int LAST_CURSOR = 0;
+	/** Page for Last File */
+	public static int LAST_PAGE = 0;
 
 	/**
 	 * @return the end of line characters according to the current settings
@@ -78,7 +80,7 @@ public class Settings implements Constants {
 
 	/**
 	 * Update the settings from the given {@link SharedPreferences}
-	 * 
+	 *
 	 * @param settings
 	 *            the settings to read from
 	 */
@@ -115,13 +117,14 @@ public class Settings implements Constants {
 		USE_HOME_PAGE = settings.getBoolean(PREFERENCE_USE_HOME_PAGE, false);
 		HOME_PAGE_PATH = settings.getString(PREFERENCE_HOME_PAGE_PATH, "");
 		LAST_CURSOR = settings.getInt(PREFERENCE_CURSOR, 0);
+        LAST_PAGE = settings.getInt(PREFERENCE_LAST_PAGE,0);
 
 		RecentFiles.loadRecentFiles(settings.getString(PREFERENCE_RECENTS, ""));
 	}
 
 	/**
 	 * Reads a preference stored as a string and returns the numeric value
-	 * 
+	 *
 	 * @param prefs
 	 *            the prefernce to read from
 	 * @param key
@@ -153,7 +156,7 @@ public class Settings implements Constants {
 
 	/**
 	 * Save the Home page settings
-	 * 
+	 *
 	 * @param settings
 	 *            the settings to write to
 	 */

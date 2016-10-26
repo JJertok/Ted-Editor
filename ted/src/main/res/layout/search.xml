@@ -1,114 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:gravity="center_vertical"
+android:visibility="gone">
+
+<TableLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:visibility="gone">
+    android:layout_height="wrap_content">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TableRow>
 
-        <TableRow>
+        <EditText
+            android:id="@+id/textSearch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawablePadding="8dp"
+            android:hint="@string/ui_hint_search"
+            android:inputType="text" />
 
-            <EditText
-                android:id="@+id/textSearch"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableLeft="@android:drawable/ic_menu_search"
-                android:drawablePadding="8dp"
-                android:hint="@string/ui_hint_search"
-                android:inputType="text" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_marginBottom="10dp"
+            android:text=""
+            android:id="@+id/textViewSearchResult" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_marginBottom="10dp"
-                android:text=""
-                android:id="@+id/textViewSearchResult" />
+        <ImageButton
+            android:id="@+id/buttonSearchPrev"
+            style="@style/ButtonSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:src="@drawable/ic_find_previous" />
 
-            <ImageButton
-                android:id="@+id/buttonSearchPrev"
-                style="@style/ButtonSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:src="@drawable/ic_find_previous" />
+        <ImageButton
+            android:id="@+id/buttonSearchNext"
+            style="@style/ButtonSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:src="@drawable/ic_find_next" />
+    </TableRow>
 
-            <ImageButton
-                android:id="@+id/buttonSearchNext"
-                style="@style/ButtonSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:src="@drawable/ic_find_next" />
-        </TableRow>
+    <TableRow>
 
-        <TableRow>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:gravity="center">
 
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="50"
-                android:gravity="center">
-
-                <CheckBox
-                    android:id="@+id/checkBoxUseRegex"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginRight="5dp"
-                    android:gravity="center"
-                    android:text="@string/ui_use_regex" />
-
-                <CheckBox
-                    android:id="@+id/checkBoxCaseSensitive"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:gravity="center"
-                    android:text="@string/ui_case_sensitive" />
-
-                <CheckBox
-                    android:id="@+id/checkBoxWholeWord"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="7dp"
-                    android:gravity="center"
-                    android:text="@string/ui_whole_word" />
-            </LinearLayout>
-        </TableRow>
-
-        <TableRow>
-
-            <EditText
-                android:id="@+id/textReplace"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableLeft="@android:drawable/ic_menu_edit"
-                android:drawablePadding="8dp"
-                android:hint="@string/ui_hint_replace"
-                android:inputType="text" />
-
-            <ImageButton
-                android:id="@+id/buttonReplace"
-                style="@style/ButtonSmall"
+            <CheckBox
+                android:id="@+id/checkBoxUseRegex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:src="@android:drawable/ic_menu_rotate" />
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="5dp"
+                android:gravity="center"
+                android:text="@string/ui_use_regex" />
 
-            <ImageButton
-                android:id="@+id/buttonReplaceAll"
-                style="@style/ButtonSmall"
+            <CheckBox
+                android:id="@+id/checkBoxCaseSensitive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:src="@drawable/ic_menu_refresh" />
-        </TableRow>
-    </TableLayout>
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:text="@string/ui_case_sensitive" />
+
+            <CheckBox
+                android:id="@+id/checkBoxWholeWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="7dp"
+                android:gravity="center"
+                android:text="@string/ui_whole_word" />
+        </LinearLayout>
+    </TableRow>
+
+    <TableRow>
+
+        <EditText
+            android:id="@+id/textReplace"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@android:drawable/ic_menu_edit"
+            android:drawablePadding="8dp"
+            android:hint="@string/ui_hint_replace"
+            android:inputType="text" />
+
+        <ImageButton
+            android:id="@+id/buttonReplace"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:src="@android:drawable/ic_menu_rotate" />
+
+        <ImageButton
+            android:id="@+id/buttonReplaceAll"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:src="@drawable/ic_menu_refresh" />
+    </TableRow>
+</TableLayout>
 </LinearLayout>

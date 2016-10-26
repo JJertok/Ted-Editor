@@ -108,12 +108,14 @@ public interface Constants {
 	/** Preference tag to retrieve the cursor for last file ( = {@value} ) */
 	public static final String PREFERENCE_CURSOR = "last_cursor";
 
+	/** Preference tag to retrieve the number of page for last file ( = {@value} ) */
+	public static final String PREFERENCE_LAST_PAGE = "last_page";
 	/** minimum text size */
 	public static final int TEXT_SIZE_MIN = 9;
 	/** maximum text size */
 	public static final int TEXT_SIZE_MAX = 40;
 
-	public static final int LINES_PER_PAGE = 300;
+	public static final int LINES_PER_PAGE = 200;
 
 	/** End of line setting for Linux files ( = {@value} ) */
 	public static final int EOL_LINUX = 0;

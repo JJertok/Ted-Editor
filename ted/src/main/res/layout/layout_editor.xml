@@ -1,33 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
-    <fr.xgouchet.texteditor.ui.view.AdvancedEditText
-        android:id="@+id/editor"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <fr.xgouchet.texteditor.ui.view.AdvancedEditText
+                android:id="@+id/editor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|left"
+                android:inputType="textMultiLine|textCapSentences|textNoSuggestions"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                android:scrollbarAlwaysDrawVerticalTrack="true"
+                android:scrollbarSize="5dp"
+                android:scrollbars="horizontal|vertical"
+                android:textCursorDrawable="@null"
+                android:typeface="monospace">
+
+                <requestFocus />
+            </fr.xgouchet.texteditor.ui.view.AdvancedEditText>
+
+            <com.software.shell.fab.ActionButton
+                android:id="@+id/buttonPrevPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:layout_marginRight="64dp"
+                android:visibility="visible"
+                fab:button_color="@color/fab_material_black"
+                fab:button_colorPressed="@color/fab_material_black"
+                fab:button_colorRipple="#757575"
+                fab:hide_animation="@anim/fab_fade_out"
+                fab:image="@drawable/ic_find_previous"
+                fab:image_size="24dp"
+                fab:rippleEffect_enabled="true"
+                fab:shadowResponsiveEffect_enabled="false"
+                fab:shadow_color="#757575"
+                fab:shadow_radius="1.0dp"
+                fab:shadow_xOffset="0.5dp"
+                fab:shadow_yOffset="1.0dp"
+                fab:show_animation="@anim/fab_fade_in"
+                fab:stroke_width="0dp"
+                fab:type="mini" />
+
+            <com.software.shell.fab.ActionButton
+                android:id="@+id/buttonNextPage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:layout_marginRight="16dp"
+                android:visibility="visible"
+                fab:button_color="@color/fab_material_black"
+                fab:button_colorPressed="@color/fab_material_black"
+                fab:button_colorRipple="#757575"
+                fab:hide_animation="@anim/fab_fade_out"
+                fab:image="@drawable/ic_find_next"
+                fab:image_size="24dp"
+                fab:rippleEffect_enabled="true"
+                fab:shadowResponsiveEffect_enabled="false"
+                fab:shadow_color="#757575"
+                fab:shadow_radius="1.0dp"
+                fab:shadow_xOffset="0.5dp"
+                fab:shadow_yOffset="1.0dp"
+                fab:show_animation="@anim/fab_fade_in"
+                fab:stroke_width="0dp"
+                fab:type="mini" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="20"
-        android:gravity="top|left"
-        android:inputType="textMultiLine|textCapSentences|textNoSuggestions"
-        android:scrollbarAlwaysDrawHorizontalTrack="true"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarSize="5dp"
-        android:scrollbars="horizontal|vertical"
-        android:textCursorDrawable="@null"
-        android:typeface="monospace" >
-
-        <requestFocus />
-    </fr.xgouchet.texteditor.ui.view.AdvancedEditText>
-
-    <include
-        android:id="@+id/pagesLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_weight="0"
-        layout="@layout/pages"
-        />
+        >
+
+        <ImageButton
+            android:id="@+id/extraSymbButton1"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button1" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton2"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button2" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton3"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button3" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton4"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button4" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton5"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button5" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton6"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button6" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton7"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button7" />
+
+        <ImageButton
+            android:id="@+id/extraSymbButton8"
+            style="@style/ButtonSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/extra_symb_button8" />
+
+    </LinearLayout>
 
     <include
         android:id="@+id/searchLayout"
@@ -35,77 +162,5 @@
         android:layout_height="wrap_content"
         android:layout_weight="0"
         layout="@layout/search" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/buttonLayout">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button1"
-            android:layout_weight="1" />
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton2"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button2"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton3"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button3"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton4"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button4"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton5"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button5"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton6"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button6"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton7"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button7"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/extraSymbButton8"
-            android:layout_weight="1"
-            style="@style/ButtonSmall"
-            android:src="@drawable/extra_symb_button8"/>
-
-    </LinearLayout>
 
 </LinearLayout>

@@ -29,8 +29,7 @@ public class PageSystem implements Constants {
                 if ((i + 1) % linesPerPage == 0) {
                     pages.add(builder.toString());
                     builder.delete(0, builder.length());
-                }
-                else builder.append("\n");
+                } else builder.append("\n");
                 i++;
                 if (i == linesCount) break;
             }
@@ -48,6 +47,21 @@ public class PageSystem implements Constants {
 
     public String getCurrentPageText() {
         return pages.get(currentPage);
+    }
+
+    public String getPageText(int page) {
+        return pages.get(page);
+    }
+
+    public int getPageLength(int page) {
+        return pages.get(page).length();
+    }
+
+    public int getPagesLength(int startPage, int endPage) {
+        int result = 0;
+        for (int i = startPage; i < endPage; i++)
+            result += pages.get(i).length();
+        return result;
     }
 
     public String getTextOfNextPages(boolean includeCurrent, int nOfPages) {
@@ -95,6 +109,11 @@ public class PageSystem implements Constants {
         currentPage = page;
     }
 
+    public void goToPageByLine(int line) {
+        int page = line / LINES_PER_PAGE;
+        goToPage(page);
+    }
+
     public void setStartingLines() {
         int i;
         int startingLine;
@@ -134,8 +153,6 @@ public class PageSystem implements Constants {
         StringBuilder allText = new StringBuilder();
         for (i = 0; i < pages.size(); i++) {
             allText.append(pages.get(i));
-            if (i < pages.size() - 1)
-                allText.append("\n");
         }
         return allText.toString();
     }

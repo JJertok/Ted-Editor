@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 17
+    compileSdkVersion 24
     buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "fr.xgouchet.texteditor"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 16
     }
+
 
     buildTypes {
         release {
@@ -20,5 +21,6 @@ android {
 
 dependencies {
     compile project(':androidLib')
+    compile 'com.github.shell-software:fab:1.1.0'
  /*   compile files('libs/juniversalchardet-1.0.3.jar')*/
 }

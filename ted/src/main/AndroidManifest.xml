@@ -6,8 +6,8 @@
     android:versionName="Release 1.8.1" >
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="16" />
+        android:minSdkVersion="9"
+        android:targetSdkVersion="17" />
 
     <permission
         android:name="fr.xgouchet.texteditor.permission.TED_INTERNAL"

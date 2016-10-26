@@ -381,7 +381,8 @@ public class AdvancedEditText extends EditText implements Constants,
      * Clear all highlights lines
      */
     public void clearHighlightLines() {
-        mHighlightLines.clear();
+        if(mHighlightLines!=null)
+            mHighlightLines.clear();
     }
 
     /**
