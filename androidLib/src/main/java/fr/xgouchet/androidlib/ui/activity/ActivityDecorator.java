@@ -54,4 +54,23 @@ public final class ActivityDecorator {
 
 	private ActivityDecorator() {
 	}
+
+	/**
+	 * Adds a Menu item either in the Option Menu (pre Honeycomb) or in the
+	 * action bar
+	 *
+	 * @param menu
+	 *            the menu to fill
+	 * @param title
+	 *            the title resource
+	 * @param icon
+	 *            the drawable (for pre honeycomb option menu)
+	 * @return the menu item
+	 */
+	public static MenuItem addCheckableMenuItem(final Menu menu, final int itemId,
+												final int title, final int icon) {
+		MenuItem item = addMenuItem(menu, itemId, title, icon);
+		item.setCheckable(true);
+		return item;
+	}
 }

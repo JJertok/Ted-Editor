@@ -58,6 +58,7 @@
     <string name="menu_settings">Nastavenia</string>
     <string name="menu_about">O aplikácii</string>
     <string name="menu_search">Hľadať</string>
+    <string name="menu_fullscreen">Celozaslonski način</string>
     <string name="menu_undo">Krok späť</string>
     <string name="menu_redo">Prerobiť</string>
     <string name="menu_share">Deliti</string>

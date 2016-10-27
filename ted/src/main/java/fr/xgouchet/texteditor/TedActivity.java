@@ -5,6 +5,7 @@ import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
 import static fr.xgouchet.androidlib.ui.Toaster.showToast;
+import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addCheckableMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemAsAction;
 import static fr.xgouchet.texteditor.common.RecentFiles.getLastPath;
@@ -43,6 +44,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -299,6 +302,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        int a = menu.size();
+
         menu.clear();
 
         addMenuItem(menu, MENU_ID_NEW, R.string.menu_new,
@@ -331,6 +336,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         addMenuItem(menu, MENU_ID_SAVE_AS, R.string.menu_save_as, 0);
 
         addMenuItem(menu, MENU_ID_SETTINGS, R.string.menu_settings, 0);
+
+        addCheckableMenuItem(menu, MENU_ID_FULLSCREEN_MODE, R.string.menu_fullscreen, 0);
+
+        menu.findItem(MENU_ID_FULLSCREEN_MODE).setChecked(mfullscreenChecked);
 
         addMenuItem(menu, MENU_ID_ABOUT, R.string.menu_about, 0);
 
@@ -381,6 +390,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
             case MENU_ID_SETTINGS:
                 settingsActivity();
+                return true;
+            case MENU_ID_FULLSCREEN_MODE:
+                item.setChecked(!item.isChecked());
+                fullscreenMode(item.isChecked());
+                mfullscreenChecked = item.isChecked();
                 return true;
             case MENU_ID_ABOUT:
                 aboutActivity();
@@ -1344,6 +1358,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         runAfterSave();
     }
 
+    /**
+     * Opens the settings activity
+     */
+    protected void fullscreenMode(boolean checked) {
+        if(checked) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
+    }
 
     /**
      * Keyboard Visibility listener
@@ -1555,15 +1581,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected boolean mReadIntent;
 
-    /**
-     * the keyboard layout root
-     */
-    protected View mButtonLayout;
-    /**
-     * Additional button coord
-     */
-    protected boolean mIsDown;
-    protected float mPreviousX;
-    protected float mPreviousY;
+    protected boolean mfullscreenChecked;
 
 }

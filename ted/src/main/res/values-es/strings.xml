@@ -57,6 +57,7 @@
     <string name="menu_save_as">Guardar como</string>
     <string name="menu_settings">Configuración</string>
     <string name="menu_about">Acerca de</string>
+    <string name="menu_fullscreen">Modo de pantalla completa</string>
     <string name="menu_search">Buscar</string>
     <string name="menu_undo">Deshacer</string>
     <string name="menu_redo">Rehacer</string>
