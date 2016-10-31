@@ -47,9 +47,7 @@ import android.view.ViewTreeObserver;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -73,9 +71,6 @@ import com.software.shell.fab.ActionButton;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
-
-
-    //TODO Put replace all operation into undo/redo stacks
 
 
     /**
@@ -1174,7 +1169,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
         matchFound = mMatcher.find(selection);
         i = mPageSystem.getCurrentPage();
 
@@ -1241,7 +1236,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mMatcher = mMatcher.region(0, selection);
 
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
@@ -1364,6 +1359,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected ArrayList<Pair<Integer, Integer>> checkAllMatches(CharSequence text, Pattern pattern) {
         ArrayList<Pair<Integer, Integer>> result = new ArrayList<Pair<Integer, Integer>>();
         Matcher mMatcher = pattern.matcher(text);
+
+        while (mMatcher.find()) {
+            result.add(new Pair<Integer, Integer>(mMatcher.start(),
+                    mMatcher.end() - mMatcher.start()));
+        }
+
+        return result;
+    }
+
+    protected ArrayList<Pair<Integer, Integer>> checkAllMatchesPerPage(int page, Pattern pattern){
+        ArrayList<Pair<Integer, Integer>> result = new ArrayList<Pair<Integer, Integer>>();
+        Matcher mMatcher = pattern.matcher(mPageSystem.getPageText(page));
 
         while (mMatcher.find()) {
             result.add(new Pair<Integer, Integer>(mMatcher.start(),
