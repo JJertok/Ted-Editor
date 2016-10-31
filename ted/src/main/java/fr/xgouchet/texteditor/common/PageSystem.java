@@ -41,6 +41,37 @@ public class PageSystem implements Constants {
         setStartingLines();
     }
 
+    public void reInitPageSystem(String text){
+
+        final int linesPerPage = LINES_PER_PAGE;
+
+        pages = new LinkedList<String>();
+        currentPage = 0;
+
+        int i = 0;
+        final String[] lines = text.split("\n");
+        StringBuilder builder = new StringBuilder();
+        final int linesCount = lines.length;
+
+        if (text.length() != 0) {
+            while (i < linesCount) {
+                builder.append(lines[i]);
+                if ((i + 1) % linesPerPage == 0) {
+                    pages.add(builder.toString());
+                    builder.delete(0, builder.length());
+                } else builder.append("\n");
+                i++;
+                if (i == linesCount) break;
+            }
+            if (builder.length() != 0) pages.add(builder.toString());
+        } else pages.add("");
+
+
+        startingLines = new ArrayList<Integer>();
+        setStartingLines();
+
+    }
+
     public int getStartingLine() {
         return startingLines.get(currentPage);
     }
@@ -79,6 +110,8 @@ public class PageSystem implements Constants {
     public void savePage(String currentText) {
         pages.set(currentPage, currentText);
     }
+
+    public void updatePage(int page, String text){pages.set(page, text);}
 
     public void addPage(String text) {
         pages.add(text);

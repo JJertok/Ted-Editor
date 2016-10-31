@@ -75,7 +75,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
 
 
-    //TODO Fix undo\redo operations with multipage system
+    //TODO Put replace all operation into undo/redo stacks
 
 
     /**
@@ -421,7 +421,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         beforeLength = s.length();
         if ((Settings.REDO && (!mInRedo) && Settings.UNDO && (!mInUndo) &&
                 (!mInReplace)) && (!mInPageChange) && (mWatcher != null))
-            mWatcher.beforeChange(s, start, count, after);
+            mWatcher.beforeChange(s, start, count, after, mPageSystem.getCurrentPage());
     }
 
     /**
@@ -431,16 +431,19 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         if (mInUndo || mInRedo || mInBrackets || mInReplace || mInPageChange)
             return;
+
         boolean bracketsChanged = true;
 
-        if (Settings.UNDO && (!mInUndo) && (mWatcher != null) && (!mInReplace)) {
+        if (Settings.UNDO && (mWatcher != null)) {
+
             if (s.length() > beforeLength) {
 
                 mInBrackets = true;
                 bracketsChanged = bracketsController(s, start);
                 mInBrackets = false;
             }
-            if (!bracketsChanged) mWatcher.afterChange(s, start, before, count);
+            if (!bracketsChanged)
+                mWatcher.afterChange(s, start, before, count, mPageSystem.getCurrentPage());
         }
     }
 
@@ -468,7 +471,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         if (secondBracket.equals("")) return false;
         s = insertInString(s, secondBracket, start + 1);
-        mWatcher.afterChange(s.toString(), start, 0, 2);
+        mWatcher.afterChange(s.toString(), start, 0, 2, mPageSystem.getCurrentPage());
         mEditor.getText().insert(start + 1, "" + secondBracket);
         mEditor.setSelection(start + 1);
         return true;
@@ -656,8 +659,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected void doClearContents() {
         mWatcher = null;
         mInUndo = true;
-        mPageSystem = new PageSystem("");
-        mEditor.setText(mPageSystem.getCurrentPageText());
+        mPageSystem.reInitPageSystem("");
+        this.goToPage(0, false);
         mCurrentFilePath = null;
         mCurrentFileName = null;
         Settings.END_OF_LINE = Settings.DEFAULT_END_OF_LINE;
@@ -694,8 +697,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             text = TextFileUtils.readTextFile(file);
             if (text != null) {
                 mInUndo = true;
-                mPageSystem = new PageSystem(text);
-                mEditor.setText(mPageSystem.getCurrentPageText());
+                mPageSystem.reInitPageSystem(text);
+                this.goToPage(0, false);
                 showPagesButton();
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = getCanonizePath(file);
@@ -740,8 +743,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             text = TextFileUtils.readInternal(this);
             if (!TextUtils.isEmpty(text)) {
                 mInUndo = true;
-                mPageSystem = new PageSystem(text);
-                mEditor.setText(mPageSystem.getCurrentPageText());
+                mPageSystem.reInitPageSystem(text);
+                this.goToPage(0, false);
                 showPagesButton();
                 mWatcher = new TextChangeWatcher();
                 mCurrentFilePath = null;
@@ -833,10 +836,19 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected boolean undo() {
         boolean didUndo = false;
         mInUndo = true;
-        int caret;
-        caret = mWatcher.undo(mEditor.getText());
-        if (caret >= 0) {
-            mEditor.setSelection(caret, caret);
+        Pair<Integer, Integer> data;
+        int prevPage = mPageSystem.getCurrentPage();
+        data = mWatcher.undo(mPageSystem);
+        if (data.first >= 0)
+            this.goToPage(data.first, false);
+        if (data.second >= 0) {
+            mEditor.setSelection(data.second, data.second);
+            didUndo = true;
+        }
+        if (data.first == -2 && data.second == -1) {
+            if (prevPage < mPageSystem.getMaxPage())
+                this.goToPage(data.first, false);
+            mEditor.setSelection(0);
             didUndo = true;
         }
         mInUndo = false;
@@ -852,10 +864,19 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected boolean redo() {
         boolean didRedo = false;
         mInRedo = true;
-        int caret;
-        caret = mWatcher.redo(mEditor.getText());
-        if (caret >= 0) {
-            mEditor.setSelection(caret, caret);
+        Pair<Integer, Integer> data;
+        int prevPage = mPageSystem.getCurrentPage();
+        data = mWatcher.redo(mPageSystem);
+        if (data.first >= 0)
+            this.goToPage(data.first, false);
+        if (data.second >= 0) {
+            mEditor.setSelection(data.second);
+            didRedo = true;
+        }
+        if (data.first == -2 && data.second == -1) {
+            if (prevPage < mPageSystem.getMaxPage())
+                this.goToPage(data.first, false);
+            mEditor.setSelection(0);
             didRedo = true;
         }
         mInRedo = false;
@@ -1105,7 +1126,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mPageSystem.goToPage(page);
         mEditor.updateLineNumber(mPageSystem.getStartingLine());
         mEditor.setText(mPageSystem.getCurrentPageText());
-        mEditor.setSelection(0);
+        if (page != mPageSystem.getCurrentPage())
+            mEditor.setSelection(0);
         mInPageChange = false;
     }
 
@@ -1177,7 +1199,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
         if (matchFound) {
             if (i != mPageSystem.getCurrentPage())
-                goToPage(i, true);
+                this.goToPage(i, true);
             mEditor.setSelection(mMatcher.start(), mMatcher.start() + (mMatcher.end() - mMatcher.start()));
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
@@ -1257,7 +1279,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (!matchFound) mSearchResults.setText(R.string.ui_search_no_matches);
         else {
             if (i != mPageSystem.getCurrentPage())
-                goToPage(i, true);
+                this.goToPage(i, true);
             mEditor.setSelection(prev, prev + size);
             if (!mEditor.isFocused())
                 mEditor.requestFocus();
@@ -1373,7 +1395,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (start != end) {
             mInReplace = true;
             mEditor.getText().replace(start, end, replaceStr);
-            // mWatcher.processReplace(replaceStr, searchStr, start);
+            mWatcher.processReplace(replaceStr, searchStr, start, mPageSystem.getCurrentPage());
             mEditor.setSelection(start + replaceStr.length());
             searchNext();
             mInReplace = false;
@@ -1409,10 +1431,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern.matcher(textBefore).find()) {
             mInReplace = true;
             textAfter = textBefore.replaceAll(mPattern.pattern(), replaceStr.toString());
-            mPageSystem = new PageSystem(textAfter);
+            mPageSystem.reInitPageSystem(textAfter);
             if (currentPage == 0)
-                goToPage(currentPage, false);
-            //mWatcher.processReplace(textAfter, textBefore, 0);
+                this.goToPage(currentPage, false);
+            mWatcher.processReplaceAll(textAfter, textBefore);
             mInReplace = false;
         } else
             Crouton.showText(this, R.string.toast_replace_not_found,
@@ -1553,7 +1575,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (last_path == "NoFiles") return false;
 
         doOpenFile(new File(last_path), false);
-        goToPage(Settings.LAST_PAGE, false);
+        this.goToPage(Settings.LAST_PAGE, false);
         setCursor(Settings.LAST_CURSOR);
 
         return true;

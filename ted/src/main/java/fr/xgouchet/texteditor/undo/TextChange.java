@@ -1,7 +1,10 @@
 package fr.xgouchet.texteditor.undo;
 
 import android.text.Editable;
+import android.util.Pair;
+
 import fr.xgouchet.texteditor.common.Constants;
+import fr.xgouchet.texteditor.common.PageSystem;
 
 public interface TextChange extends Constants {
 
@@ -12,7 +15,7 @@ public interface TextChange extends Constants {
 	 *            the editable object on which the undo is done
 	 * @return the caret position after the undo
 	 */
-	public int undo(Editable text);
+	public Pair<Integer,Integer> undo(PageSystem pages);
 
 	/**
 	 * Redo this change
@@ -21,7 +24,7 @@ public interface TextChange extends Constants {
 	 *            the editable object on which the redo is done
 	 * @return the caret position after the redo
 	 */
-	public int redo(Editable text);
+	public Pair<Integer,Integer> redo(PageSystem pages);
 
 	/**
 	 * Method is deprecated, you should use the canMergeXXX methods instead
