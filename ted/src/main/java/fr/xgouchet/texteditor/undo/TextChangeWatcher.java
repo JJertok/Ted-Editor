@@ -134,7 +134,7 @@ public class TextChangeWatcher implements Constants {
 			}
 		}
 
-		// printStack();
+		printStack();
 	}
 
 	/**

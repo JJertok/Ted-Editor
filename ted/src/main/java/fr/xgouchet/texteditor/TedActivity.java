@@ -60,6 +60,7 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
+import fr.xgouchet.texteditor.common.VersionsFiles;
 import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.listener.ButtonPanelListener;
@@ -82,6 +83,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         setContentView(R.layout.layout_editor);
         Settings.updateFromPreferences(getSharedPreferences(PREFERENCES_NAME,
                 MODE_PRIVATE));
+
 
         mReadIntent = true;
 
@@ -108,14 +110,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mSearchResults = (TextView) findViewById(R.id.textViewSearchResult);
 
         //Buttons with symbols on additional panel
-        findViewById(R.id.extraSymbButton1).setOnTouchListener( new ButtonPanelListener(1, mEditor));
-        findViewById(R.id.extraSymbButton2).setOnTouchListener( new ButtonPanelListener(2, mEditor));
-        findViewById(R.id.extraSymbButton3).setOnTouchListener( new ButtonPanelListener(3, mEditor));
-        findViewById(R.id.extraSymbButton4).setOnTouchListener( new ButtonPanelListener(4, mEditor));
-        findViewById(R.id.extraSymbButton5).setOnTouchListener( new ButtonPanelListener(5, mEditor));
-        findViewById(R.id.extraSymbButton6).setOnTouchListener( new ButtonPanelListener(6, mEditor));
-        findViewById(R.id.extraSymbButton7).setOnTouchListener( new ButtonPanelListener(7, mEditor));
-        findViewById(R.id.extraSymbButton8).setOnTouchListener( new ButtonPanelListener(8, mEditor));
+        findViewById(R.id.extraSymbButton1).setOnTouchListener(new ButtonPanelListener(1, mEditor));
+        findViewById(R.id.extraSymbButton2).setOnTouchListener(new ButtonPanelListener(2, mEditor));
+        findViewById(R.id.extraSymbButton3).setOnTouchListener(new ButtonPanelListener(3, mEditor));
+        findViewById(R.id.extraSymbButton4).setOnTouchListener(new ButtonPanelListener(4, mEditor));
+        findViewById(R.id.extraSymbButton5).setOnTouchListener(new ButtonPanelListener(5, mEditor));
+        findViewById(R.id.extraSymbButton6).setOnTouchListener(new ButtonPanelListener(6, mEditor));
+        findViewById(R.id.extraSymbButton7).setOnTouchListener(new ButtonPanelListener(7, mEditor));
+        findViewById(R.id.extraSymbButton8).setOnTouchListener(new ButtonPanelListener(8, mEditor));
 
 
         findViewById(R.id.buttonSearchNext).setOnClickListener(this);
@@ -129,6 +131,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
+        mVersions = new VersionsFiles(getApplicationContext());
     }
 
     protected void initHighlighter() {
@@ -147,7 +150,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected void onStart() {
         super.onStart();
-
         TedChangelog changeLog;
         SharedPreferences prefs;
 
@@ -269,6 +271,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                     Log.d(TAG, "Open : " + extras.getString("path"));
                 doOpenFile(new File(extras.getString("path")), false);
                 break;
+            case REQUEST_VERSIONS:
+                if (BuildConfig.DEBUG)
+                    Log.d(TAG, "Open : " + extras.getString("path"));
+
+                doOpenFile(new File(extras.getString("path")), false);
+                break;
         }
     }
 
@@ -278,11 +286,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         //if (BuildConfig.DEBUG)
-            Log.d(TAG, "onConfigurationChanged");
+        Log.d(TAG, "onConfigurationChanged");
         if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_NO) {
-            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard0");
+            mEditor.getText().insert(mEditor.getSelectionStart(), "Test_keyboard0");
         } else if (newConfig.keyboardHidden == Configuration.KEYBOARDHIDDEN_YES) {
-            mEditor.getText().insert(mEditor.getSelectionStart(),"Test_keyboard_yes");
+            mEditor.getText().insert(mEditor.getSelectionStart(), "Test_keyboard_yes");
         }
     }
 
@@ -332,6 +340,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
+
+        addMenuItem(menu, MENU_ID_VERSIONS, R.string.menu_versions,
+                R.drawable.ic_menu_file_open);
 
         addMenuItem(menu, MENU_ID_SAVE_AS, R.string.menu_save_as, 0);
 
@@ -395,6 +406,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 item.setChecked(!item.isChecked());
                 fullscreenMode(item.isChecked());
                 mfullscreenChecked = item.isChecked();
+                return true;
+            case MENU_ID_VERSIONS:
+                openFileVersions();
                 return true;
             case MENU_ID_ABOUT:
                 aboutActivity();
@@ -797,6 +811,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mReadOnly = false;
         mDirty = false;
         updateTitle();
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mEditor.getText().toString());
         Crouton.showText(this, R.string.toast_save_success, Style.CONFIRM);
 
         runAfterSave();
@@ -969,6 +984,30 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 open.setClass(TedActivity.this, TedOpenRecentActivity.class);
                 try {
                     startActivityForResult(open, REQUEST_OPEN);
+                } catch (ActivityNotFoundException e) {
+                    Crouton.showText(TedActivity.this,
+                            R.string.toast_activity_open_recent, Style.ALERT);
+                }
+            }
+        };
+
+        promptSaveDirty();
+    }
+
+    protected void openFileVersions() {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "openFileVersions");
+        if(mVersions.loadVersions(String.valueOf(mCurrentFilePath.hashCode())).size()==0) return;
+
+        mAfterSave = new Runnable() {
+            public void run() {
+                Intent open;
+
+                open = new Intent();
+                open.setClass(TedActivity.this, TedOpenVersionsActivity.class);
+                open.putExtra("originalPath", mCurrentFilePath);
+                try {
+                    startActivityForResult(open, REQUEST_VERSIONS);
                 } catch (ActivityNotFoundException e) {
                     Crouton.showText(TedActivity.this,
                             R.string.toast_activity_open_recent, Style.ALERT);
@@ -1362,7 +1401,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Opens the settings activity
      */
     protected void fullscreenMode(boolean checked) {
-        if(checked) {
+        if (checked) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
@@ -1373,6 +1412,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
     /**
      * Keyboard Visibility listener
+     *
      * @param onKeyboardVisibilityListener
      */
     private void setKeyboardVisibilityListener(final OnKeyboardVisibilityListener onKeyboardVisibilityListener) {
@@ -1381,7 +1421,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
             private boolean alreadyOpen;
             private final int defaultKeyboardHeightDP = 100;
-            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN? 48 : 0);
+            private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN ? 48 : 0);
             private final Rect rect = new Rect();
 
             @Override
@@ -1408,9 +1448,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     @Override
     public void onVisibilityChanged(boolean visible) {
-        if(visible){
+        if (visible) {
             findViewById(R.id.buttonLayout).setVisibility(View.VISIBLE);
-        }else{
+        } else {
             findViewById(R.id.buttonLayout).setVisibility(View.GONE);
         }
     }
@@ -1463,7 +1503,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     /**
      * Open last saved file at start application
      */
-    public boolean openLastFile(){
+    public boolean openLastFile() {
         String last_path = getLastPath();
 
         if (last_path == "NoFiles") return false;
@@ -1476,14 +1516,14 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     /**
      * Get current position in text
      */
-    public int getPosStart(){
+    public int getPosStart() {
         return mEditor.getSelectionStart();
     }
 
     /**
      * Write position into preferences
      */
-    public void saveCursor(SharedPreferences prefs){
+    public void saveCursor(SharedPreferences prefs) {
         SharedPreferences.Editor editor;
 
         editor = prefs.edit();
@@ -1497,7 +1537,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Set position in selectionSt
      */
     public void setCursor(int posStart) {
-        if(mEditor.length() < posStart) return;
+        if (mEditor.length() < posStart) return;
         mEditor.setSelection(posStart, posStart);
     }
 
@@ -1582,5 +1622,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected boolean mReadIntent;
 
     protected boolean mfullscreenChecked;
+
+    protected VersionsFiles mVersions;
 
 }

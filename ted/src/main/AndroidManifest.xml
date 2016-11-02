@@ -129,6 +129,13 @@
             android:windowSoftInputMode="stateHidden" >
         </activity>
 
+        <!-- Ted open versions activity -->
+        <activity
+            android:name=".TedOpenVersionsActivity"
+            android:label="@string/title_open_versions"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+
         <!-- Ted Select font activity -->
         <activity
             android:name=".TedFontActivity"
