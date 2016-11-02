@@ -415,8 +415,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         beforeLength = s.length();
         if ((Settings.REDO && (!mInRedo) && Settings.UNDO && (!mInUndo) &&
-                (!mInReplace)) && (!mInPageChange) && (mWatcher != null))
+                (!mInReplace)) && (!mInPageChange) && (mWatcher != null)) {
+            mPageSystem.savePage(mEditor.getText().toString());
             mWatcher.beforeChange(s, start, count, after, mPageSystem.getCurrentPage());
+        }
     }
 
     /**
@@ -437,8 +439,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 bracketsChanged = bracketsController(s, start);
                 mInBrackets = false;
             }
-            if (!bracketsChanged)
+            if (!bracketsChanged) {
+                mPageSystem.savePage(mEditor.getText().toString());
                 mWatcher.afterChange(s, start, before, count, mPageSystem.getCurrentPage());
+            }
         }
     }
 
@@ -837,7 +841,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (data.first >= 0)
             this.goToPage(data.first, false);
         if (data.second >= 0) {
-            mEditor.setSelection(data.second, data.second);
+            mEditor.setSelection(data.second);
             didUndo = true;
         }
         if (data.first == -2 && data.second == -1) {
