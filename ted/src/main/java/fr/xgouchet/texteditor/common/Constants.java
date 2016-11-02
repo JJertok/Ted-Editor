@@ -40,6 +40,10 @@ public interface Constants {
 	public static final int MENU_ID_UNDO = 8;
 	/** redo last change ( = {@value} ) */
 	public static final int MENU_ID_REDO = 9;
+	/** open the settings ( = {@value} ) */
+	public static final int MENU_ID_SHARE = 10;
+	/** open the settings ( = {@value} ) */
+	public static final int MENU_ID_FULLSCREEN_MODE = 11;
 	/** Quit the app ( = {@value} ) */
 	public static final int MENU_ID_QUIT = 666;
 

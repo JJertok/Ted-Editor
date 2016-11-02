@@ -1,9 +1,11 @@
 package fr.xgouchet.texteditor;
 
+import static android.text.Selection.getSelectionStart;
 import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
 import static fr.xgouchet.androidlib.ui.Toaster.showToast;
+import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addCheckableMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.addMenuItem;
 import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemAsAction;
 import static fr.xgouchet.texteditor.common.RecentFiles.getLastPath;
@@ -44,6 +46,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -71,7 +75,6 @@ import com.software.shell.fab.ActionButton;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
-
 
     /**
      * @see android.app.Activity#onCreate(android.os.Bundle)
@@ -309,6 +312,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
 
+        int a = menu.size();
+
         menu.clear();
 
         addMenuItem(menu, MENU_ID_NEW, R.string.menu_new,
@@ -331,6 +336,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         addMenuItem(menu, MENU_ID_SEARCH, R.string.menu_search,
                 R.drawable.ic_menu_search);
 
+        addMenuItem(menu, MENU_ID_SHARE, R.string.menu_share,
+                R.drawable.ic_menu_share);
+
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
@@ -338,6 +346,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         addMenuItem(menu, MENU_ID_SAVE_AS, R.string.menu_save_as, 0);
 
         addMenuItem(menu, MENU_ID_SETTINGS, R.string.menu_settings, 0);
+
+        addCheckableMenuItem(menu, MENU_ID_FULLSCREEN_MODE, R.string.menu_fullscreen, 0);
+
+        menu.findItem(MENU_ID_FULLSCREEN_MODE).setChecked(mfullscreenChecked);
 
         addMenuItem(menu, MENU_ID_ABOUT, R.string.menu_about, 0);
 
@@ -354,6 +366,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         showMenuItemAsAction(menu.findItem(MENU_ID_SEARCH),
                 R.drawable.ic_menu_search);
+
 
         return true;
     }
@@ -382,8 +395,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             case MENU_ID_SEARCH:
                 search();
                 break;
+            case MENU_ID_SHARE:
+                share();
+                break;
             case MENU_ID_SETTINGS:
                 settingsActivity();
+                return true;
+            case MENU_ID_FULLSCREEN_MODE:
+                item.setChecked(!item.isChecked());
+                fullscreenMode(item.isChecked());
+                mfullscreenChecked = item.isChecked();
                 return true;
             case MENU_ID_ABOUT:
                 aboutActivity();
@@ -470,6 +491,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         if (secondBracket.equals("")) return false;
         s = insertInString(s, secondBracket, start + 1);
+        mPageSystem.savePage(mEditor.getText().toString())
         mWatcher.afterChange(s.toString(), start, 0, 2, mPageSystem.getCurrentPage());
         mEditor.getText().insert(start + 1, "" + secondBracket);
         mEditor.setSelection(start + 1);
@@ -1149,6 +1171,19 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
+     * Opens / close the search interface
+     */
+    protected void share() {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "share");
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, mEditor.getText().toString());
+        sendIntent.setType("text/plain/file/audio/video");
+        startActivity(sendIntent);
+    }
+
+    /**
      * Uses the user input to search a file
      */
     protected void searchNext() {
@@ -1486,6 +1521,18 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         runAfterSave();
     }
 
+    /**
+     * Opens the settings activity
+     */
+    protected void fullscreenMode(boolean checked) {
+        if(checked) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        }
+    }
 
     /**
      * Keyboard Visibility listener
@@ -1509,6 +1556,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 boolean isShown = heightDiff >= estimatedKeyboardHeight;
 
                 if (isShown == alreadyOpen) {
+                    Log.i("Keyboard state", "Ignoring global layout change...");
                     return;
                 }
                 alreadyOpen = isShown;
@@ -1720,4 +1768,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Timer for hiding floating button
      */
     protected Timer mTimer;
+    protected boolean mfullscreenChecked;
+
 }
