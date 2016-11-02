@@ -491,7 +491,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         if (secondBracket.equals("")) return false;
         s = insertInString(s, secondBracket, start + 1);
-        mPageSystem.savePage(mEditor.getText().toString())
+        mPageSystem.savePage(mEditor.getText().toString());
         mWatcher.afterChange(s.toString(), start, 0, 2, mPageSystem.getCurrentPage());
         mEditor.getText().insert(start + 1, "" + secondBracket);
         mEditor.setSelection(start + 1);
@@ -1178,7 +1178,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             Log.d(TAG, "share");
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, mEditor.getText().toString());
+        sendIntent.putExtra(Intent.EXTRA_TEXT, mPageSystem.getAllText(mEditor.getText().toString()));
         sendIntent.setType("text/plain/file/audio/video");
         startActivity(sendIntent);
     }
