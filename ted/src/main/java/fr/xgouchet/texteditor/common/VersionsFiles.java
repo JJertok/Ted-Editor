@@ -111,7 +111,25 @@ public class VersionsFiles {
      *
      * @param path path of version for deleting excess versions, which were saved later
      */
-    public static void deleteExcessVersions(String path) {
+    public void deleteExcessVersions(String path) {
+
+        int countf = 0;
+        StringBuffer reversePath = new StringBuffer(path).reverse();
+        String cntPath = reversePath.substring(4,5);
+        File f;
+        if (Integer.valueOf(cntPath)==0)
+            countf = 10;
+        else {
+            countf = Integer.valueOf(cntPath);
+            String exDir = new StringBuffer(reversePath.substring(5,reversePath.length())).reverse().toString();
+            for (int i = countf; i <= 10; i++) {
+                String exPath = exDir + i + ".txt";
+                f = new File(exPath);
+                if (f.exists()) {
+                    f.delete();
+                }
+            }
+        }
 
     }
 

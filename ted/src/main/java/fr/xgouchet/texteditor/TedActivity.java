@@ -274,8 +274,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             case REQUEST_VERSIONS:
                 if (BuildConfig.DEBUG)
                     Log.d(TAG, "Open : " + extras.getString("path"));
-
-                doOpenFile(new File(extras.getString("path")), false);
+                doOpenFileVersion(new File(extras.getString("path")), false);
                 break;
         }
     }
@@ -735,6 +734,43 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         return false;
     }
 
+    protected boolean doOpenFileVersion(File file, boolean forceReadOnly) {
+        String text;
+
+        if (file == null)
+            return false;
+
+        if (BuildConfig.DEBUG)
+            Log.i(TAG, "Openning file " + file.getName());
+
+        try {
+            text = TextFileUtils.readTextFile(file);
+            if (text != null) {
+                mInUndo = true;
+                mEditor.setText(text);
+                TextFileUtils.writeTextFile(mCurrentFilePath,text);
+                mWatcher = new TextChangeWatcher();
+                mDirty = false;
+                mInUndo = false;
+                mDoNotBackup = false;
+                if (file.canWrite() && (!forceReadOnly)) {
+                    mReadOnly = false;
+                    mEditor.setEnabled(true);
+                } else {
+                    mReadOnly = true;
+                    mEditor.setEnabled(false);
+                }
+                mVersions.deleteExcessVersions(file.getAbsolutePath());
+                return true;
+            } else {
+                Crouton.showText(this, R.string.toast_open_error, Style.ALERT);
+            }
+        } catch (OutOfMemoryError e) {
+            Crouton.showText(this, R.string.toast_memory_open, Style.ALERT);
+        }
+
+        return false;
+    }
     /**
      * Open the last backup file
      *
