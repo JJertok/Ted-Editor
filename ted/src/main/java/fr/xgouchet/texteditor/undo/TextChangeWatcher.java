@@ -129,6 +129,8 @@ public class TextChangeWatcher implements Constants {
 
         // printStack();
     }
+		printStack();
+	}
 
     /**
      * @param s     the sequence being modified

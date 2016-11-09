@@ -84,6 +84,7 @@
                 android:summaryOn="@string/config_summary_auto_save_overwrite_on"
                 android:title="@string/config_title_auto_save_overwrite" />
         </PreferenceScreen>
+
         <PreferenceScreen android:title="@string/config_cat_undo" >
             <CheckBoxPreference
                 android:defaultValue="true"

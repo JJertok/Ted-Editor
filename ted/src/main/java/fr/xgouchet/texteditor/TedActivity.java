@@ -63,6 +63,7 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
+import fr.xgouchet.texteditor.common.VersionsFiles;
 import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.listener.ButtonPanelListener;
@@ -143,6 +144,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
+        mVersions = new VersionsFiles(getApplicationContext());
     }
 
     protected void initHighlighter() {
@@ -161,7 +163,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected void onStart() {
         super.onStart();
-
         TedChangelog changeLog;
         SharedPreferences prefs;
 
@@ -283,6 +284,11 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                     Log.d(TAG, "Open : " + extras.getString("path"));
                 doOpenFile(new File(extras.getString("path")), false);
                 break;
+            case REQUEST_VERSIONS:
+                if (BuildConfig.DEBUG)
+                    Log.d(TAG, "Open : " + extras.getString("path"));
+                doOpenFileVersion(new File(extras.getString("path")), false);
+                break;
         }
     }
 
@@ -342,6 +348,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
+
+        addMenuItem(menu, MENU_ID_VERSIONS, R.string.menu_versions,
+                R.drawable.ic_menu_file_open);
 
         addMenuItem(menu, MENU_ID_SAVE_AS, R.string.menu_save_as, 0);
 
@@ -405,6 +414,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 item.setChecked(!item.isChecked());
                 fullscreenMode(item.isChecked());
                 mfullscreenChecked = item.isChecked();
+                return true;
+            case MENU_ID_VERSIONS:
+                openFileVersions();
                 return true;
             case MENU_ID_ABOUT:
                 aboutActivity();
@@ -751,6 +763,43 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         return false;
     }
 
+    protected boolean doOpenFileVersion(File file, boolean forceReadOnly) {
+        String text;
+
+        if (file == null)
+            return false;
+
+        if (BuildConfig.DEBUG)
+            Log.i(TAG, "Openning file " + file.getName());
+
+        try {
+            text = TextFileUtils.readTextFile(file);
+            if (text != null) {
+                mInUndo = true;
+                mEditor.setText(text);
+                TextFileUtils.writeTextFile(mCurrentFilePath,text);
+                mWatcher = new TextChangeWatcher();
+                mDirty = false;
+                mInUndo = false;
+                mDoNotBackup = false;
+                if (file.canWrite() && (!forceReadOnly)) {
+                    mReadOnly = false;
+                    mEditor.setEnabled(true);
+                } else {
+                    mReadOnly = true;
+                    mEditor.setEnabled(false);
+                }
+                mVersions.deleteExcessVersions(file.getAbsolutePath());
+                return true;
+            } else {
+                Crouton.showText(this, R.string.toast_open_error, Style.ALERT);
+            }
+        } catch (OutOfMemoryError e) {
+            Crouton.showText(this, R.string.toast_memory_open, Style.ALERT);
+        }
+
+        return false;
+    }
     /**
      * Open the last backup file
      *
@@ -830,6 +879,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mReadOnly = false;
         mDirty = false;
         updateTitle();
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mEditor.getText().toString());
         Crouton.showText(this, R.string.toast_save_success, Style.CONFIRM);
 
         runAfterSave();
@@ -1020,6 +1070,30 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 open.setClass(TedActivity.this, TedOpenRecentActivity.class);
                 try {
                     startActivityForResult(open, REQUEST_OPEN);
+                } catch (ActivityNotFoundException e) {
+                    Crouton.showText(TedActivity.this,
+                            R.string.toast_activity_open_recent, Style.ALERT);
+                }
+            }
+        };
+
+        promptSaveDirty();
+    }
+
+    protected void openFileVersions() {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "openFileVersions");
+        if(mVersions.loadVersions(String.valueOf(mCurrentFilePath.hashCode())).size()==0) return;
+
+        mAfterSave = new Runnable() {
+            public void run() {
+                Intent open;
+
+                open = new Intent();
+                open.setClass(TedActivity.this, TedOpenVersionsActivity.class);
+                open.putExtra("originalPath", mCurrentFilePath);
+                try {
+                    startActivityForResult(open, REQUEST_VERSIONS);
                 } catch (ActivityNotFoundException e) {
                     Crouton.showText(TedActivity.this,
                             R.string.toast_activity_open_recent, Style.ALERT);
@@ -1525,7 +1599,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Opens the settings activity
      */
     protected void fullscreenMode(boolean checked) {
-        if(checked) {
+        if (checked) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
@@ -1769,5 +1843,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected Timer mTimer;
     protected boolean mfullscreenChecked;
+
+    protected VersionsFiles mVersions;
 
 }
