@@ -1,5 +1,6 @@
 package fr.xgouchet.texteditor;
 
+import static android.text.Selection.getSelectionStart;
 import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
@@ -64,6 +65,7 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
+import fr.xgouchet.texteditor.common.VersionsFiles;
 import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.listener.ButtonPanelListener;
@@ -145,7 +147,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
-
+        mVersions = new VersionsFiles(getApplicationContext());
     }
 
     protected void initHighlighter() {
@@ -160,11 +162,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onStart()
+     * @see android.app.Activity#onStart()
      */
     protected void onStart() {
         super.onStart();
-
         TedChangelog changeLog;
         SharedPreferences prefs;
 
@@ -190,13 +191,10 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
 
         changeLog.saveCurrentVersion(this, prefs);
-//        // ATTENTION: This was auto-generated to implement the App Indexing API.
-//        // See https://g.co/AppIndexing/AndroidStudio for more information.
-//        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     /**
-     * @see Activity#onRestart()
+     * @see android.app.Activity#onRestart()
      */
     protected void onRestart() {
         super.onRestart();
@@ -204,7 +202,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onRestoreInstanceState(Bundle)
+     * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
      */
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -213,7 +211,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onResume()
+     * @see android.app.Activity#onResume()
      */
     protected void onResume() {
         super.onResume();
@@ -231,7 +229,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onPause()
+     * @see android.app.Activity#onPause()
      */
     protected void onPause() {
         super.onPause();
@@ -249,8 +247,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onActivityResult(int, int,
-     * Intent)
+     * @see android.app.Activity#onActivityResult(int, int,
+     * android.content.Intent)
      */
     @TargetApi(11)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -289,11 +287,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                     Log.d(TAG, "Open : " + extras.getString("path"));
                 doOpenFile(new File(extras.getString("path")), false);
                 break;
+            case REQUEST_VERSIONS:
+                if (BuildConfig.DEBUG)
+                    Log.d(TAG, "Open : " + extras.getString("path"));
+                doOpenFileVersion(new File(extras.getString("path")), false);
+                break;
         }
     }
 
     /**
-     * @see Activity#onConfigurationChanged(Configuration)
+     * @see android.app.Activity#onConfigurationChanged(android.content.res.Configuration)
      */
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -303,7 +306,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onCreateOptionsMenu(Menu)
+     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
      */
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -312,7 +315,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onPrepareOptionsMenu(Menu)
+     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
      */
     @TargetApi(11)
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -352,6 +355,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
 
+        addMenuItem(menu, MENU_ID_VERSIONS, R.string.menu_versions,
+                R.drawable.ic_menu_file_open);
+
         addMenuItem(menu, MENU_ID_SAVE_AS, R.string.menu_save_as, 0);
 
         addMenuItem(menu, MENU_ID_SETTINGS, R.string.menu_settings, 0);
@@ -381,7 +387,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onOptionsItemSelected(MenuItem)
+     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
      */
     public boolean onOptionsItemSelected(MenuItem item) {
         mWarnedShouldQuit = false;
@@ -418,6 +424,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 fullscreenMode(item.isChecked());
                 mfullscreenChecked = item.isChecked();
                 return true;
+            case MENU_ID_VERSIONS:
+                openFileVersions();
+                return true;
             case MENU_ID_ABOUT:
                 aboutActivity();
                 return true;
@@ -440,7 +449,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see TextWatcher#beforeTextChanged(CharSequence,
+     * @see android.text.TextWatcher#beforeTextChanged(java.lang.CharSequence,
      * int, int, int)
      */
     public void beforeTextChanged(CharSequence s, int start, int count,
@@ -455,7 +464,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see TextWatcher#onTextChanged(CharSequence, int,
+     * @see android.text.TextWatcher#onTextChanged(java.lang.CharSequence, int,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -524,7 +533,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see TextWatcher#afterTextChanged(Editable)
+     * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
      */
     public void afterTextChanged(Editable s) {
 
@@ -550,7 +559,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see Activity#onKeyUp(int, KeyEvent)
+     * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
      */
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -763,6 +772,45 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         return false;
     }
 
+    protected boolean doOpenFileVersion(File file, boolean forceReadOnly) {
+        String text;
+
+        if (file == null)
+            return false;
+
+        if (BuildConfig.DEBUG)
+            Log.i(TAG, "Openning file " + file.getName());
+
+        try {
+            text = TextFileUtils.readTextFile(file);
+            if (text != null) {
+                mInUndo = true;
+                mPageSystem.reInitPageSystem(text);
+                this.goToPage(0, false);
+                showPagesButton();
+                TextFileUtils.writeTextFile(mCurrentFilePath,text);
+                mWatcher = new TextChangeWatcher();
+                mDirty = false;
+                mInUndo = false;
+                mDoNotBackup = false;
+                if (file.canWrite() && (!forceReadOnly)) {
+                    mReadOnly = false;
+                    mEditor.setEnabled(true);
+                } else {
+                    mReadOnly = true;
+                    mEditor.setEnabled(false);
+                }
+                mVersions.deleteExcessVersions(file.getAbsolutePath());
+                return true;
+            } else {
+                Crouton.showText(this, R.string.toast_open_error, Style.ALERT);
+            }
+        } catch (OutOfMemoryError e) {
+            Crouton.showText(this, R.string.toast_memory_open, Style.ALERT);
+        }
+
+        return false;
+    }
     /**
      * Open the last backup file
      *
@@ -842,6 +890,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mReadOnly = false;
         mDirty = false;
         updateTitle();
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mPageSystem.getAllText(mEditor.getText().toString()));
         Crouton.showText(this, R.string.toast_save_success, Style.CONFIRM);
 
         runAfterSave();
@@ -853,6 +902,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
         mPageSystem.savePage(mEditor.getText().toString());
         String text = mPageSystem.getAllText(mEditor.getText().toString());
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mPageSystem.getAllText(mEditor.getText().toString()));
         if (text.length() == 0)
             return;
 
@@ -1042,6 +1092,30 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         promptSaveDirty();
     }
 
+    protected void openFileVersions() {
+        if (BuildConfig.DEBUG)
+            Log.d(TAG, "openFileVersions");
+        if(mVersions.loadVersions(String.valueOf(mCurrentFilePath.hashCode())).size()==0) return;
+
+        mAfterSave = new Runnable() {
+            public void run() {
+                Intent open;
+
+                open = new Intent();
+                open.setClass(TedActivity.this, TedOpenVersionsActivity.class);
+                open.putExtra("originalPath", mCurrentFilePath);
+                try {
+                    startActivityForResult(open, REQUEST_VERSIONS);
+                } catch (ActivityNotFoundException e) {
+                    Crouton.showText(TedActivity.this,
+                            R.string.toast_activity_open_recent, Style.ALERT);
+                }
+            }
+        };
+
+        promptSaveDirty();
+    }
+
     /**
      * Warns the user that the next back press will qui the application, or quit
      * if the warning has already been shown
@@ -1183,7 +1257,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * Opens / close the share interface
+     * Opens / close the search interface
      */
     protected void share() {
         if (BuildConfig.DEBUG)
@@ -1796,6 +1870,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected Timer mTimer;
     protected boolean mfullscreenChecked;
 
-
+    protected VersionsFiles mVersions;
 
 }

@@ -6,7 +6,7 @@ import android.os.Environment;
 
 /**
  * @author x.gouchet
- * 
+ *
  */
 public interface Constants {
 
@@ -46,6 +46,8 @@ public interface Constants {
 	public static final int MENU_ID_FULLSCREEN_MODE = 11;
 	/** open the settings ( = {@value} ) */
 	public static final int MENU_ID_PRINT = 12;
+	/** versions( = {@value} ) */
+	public static final int MENU_ID_VERSIONS = 13;
 	/** Quit the app ( = {@value} ) */
 	public static final int MENU_ID_QUIT = 666;
 
@@ -162,6 +164,8 @@ public interface Constants {
 	public static final int REQUEST_HOME_PAGE = 109;
 	/** Request code for Font Activity */
 	public static final int REQUEST_FONT = 110;
+	/** Request code for Versions Activity */
+	public static final int REQUEST_VERSIONS = 111;
 
 	/** extra when browsing for file */
 	public static final String EXTRA_REQUEST_CODE = "request_code";
