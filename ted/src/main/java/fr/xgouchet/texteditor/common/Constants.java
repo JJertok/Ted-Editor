@@ -44,6 +44,8 @@ public interface Constants {
 	public static final int MENU_ID_SHARE = 10;
 	/** open the settings ( = {@value} ) */
 	public static final int MENU_ID_FULLSCREEN_MODE = 11;
+	/** open the settings ( = {@value} ) */
+	public static final int MENU_ID_PRINT = 12;
 	/** Quit the app ( = {@value} ) */
 	public static final int MENU_ID_QUIT = 666;
 

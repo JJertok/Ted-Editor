@@ -11,14 +11,19 @@ import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemA
 import static fr.xgouchet.texteditor.common.RecentFiles.getLastPath;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -29,10 +34,27 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.pdf.PdfDocument;
+import android.icu.text.SimpleDateFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.CancellationSignal;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.print.PageRange;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintDocumentInfo;
+import android.print.PrintManager;
+import android.print.pdf.PrintedPdfDocument;
+import android.provider.DocumentsContract;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -58,6 +80,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import de.neofonie.mobile.app.android.widget.crouton.Crouton;
 import de.neofonie.mobile.app.android.widget.crouton.Style;
 import fr.xgouchet.texteditor.common.Constants;
+import fr.xgouchet.texteditor.common.MyPrintDocumentAdapter;
 import fr.xgouchet.texteditor.common.PageSystem;
 import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
@@ -71,13 +94,23 @@ import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.software.shell.fab.ActionButton;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
 
     /**
-     * @see android.app.Activity#onCreate(android.os.Bundle)
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
+    /**
+     * @see Activity#onCreate(Bundle)
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +176,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     protected void initHighlighter() {
@@ -157,10 +193,12 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onStart()
+     * @see Activity#onStart()
      */
     protected void onStart() {
-        super.onStart();
+        super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
+// See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
 
         TedChangelog changeLog;
         SharedPreferences prefs;
@@ -187,10 +225,13 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
 
         changeLog.saveCurrentVersion(this, prefs);
+//        // ATTENTION: This was auto-generated to implement the App Indexing API.
+//        // See https://g.co/AppIndexing/AndroidStudio for more information.
+//        AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
 
     /**
-     * @see android.app.Activity#onRestart()
+     * @see Activity#onRestart()
      */
     protected void onRestart() {
         super.onRestart();
@@ -198,7 +239,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onRestoreInstanceState(android.os.Bundle)
+     * @see Activity#onRestoreInstanceState(Bundle)
      */
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -207,7 +248,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onResume()
+     * @see Activity#onResume()
      */
     protected void onResume() {
         super.onResume();
@@ -225,7 +266,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onPause()
+     * @see Activity#onPause()
      */
     protected void onPause() {
         super.onPause();
@@ -243,8 +284,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onActivityResult(int, int,
-     * android.content.Intent)
+     * @see Activity#onActivityResult(int, int,
+     * Intent)
      */
     @TargetApi(11)
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -287,7 +328,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onConfigurationChanged(android.content.res.Configuration)
+     * @see Activity#onConfigurationChanged(Configuration)
      */
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -297,7 +338,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onCreateOptionsMenu(android.view.Menu)
+     * @see Activity#onCreateOptionsMenu(Menu)
      */
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -306,7 +347,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onPrepareOptionsMenu(android.view.Menu)
+     * @see Activity#onPrepareOptionsMenu(Menu)
      */
     @TargetApi(11)
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -338,6 +379,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         addMenuItem(menu, MENU_ID_SHARE, R.string.menu_share,
                 R.drawable.ic_menu_share);
+
+        addMenuItem(menu, MENU_ID_PRINT, R.string.menu_print,
+                R.drawable.ic_menu_print);
 
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
@@ -372,7 +416,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+     * @see Activity#onOptionsItemSelected(MenuItem)
      */
     public boolean onOptionsItemSelected(MenuItem item) {
         mWarnedShouldQuit = false;
@@ -397,6 +441,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
             case MENU_ID_SHARE:
                 share();
+                break;
+            case MENU_ID_PRINT:
+                print();
                 break;
             case MENU_ID_SETTINGS:
                 settingsActivity();
@@ -428,7 +475,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.text.TextWatcher#beforeTextChanged(java.lang.CharSequence,
+     * @see TextWatcher#beforeTextChanged(CharSequence,
      * int, int, int)
      */
     public void beforeTextChanged(CharSequence s, int start, int count,
@@ -443,7 +490,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.text.TextWatcher#onTextChanged(java.lang.CharSequence, int,
+     * @see TextWatcher#onTextChanged(CharSequence, int,
      * int, int)
      */
     public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -512,7 +559,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.text.TextWatcher#afterTextChanged(android.text.Editable)
+     * @see TextWatcher#afterTextChanged(Editable)
      */
     public void afterTextChanged(Editable s) {
 
@@ -538,7 +585,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * @see android.app.Activity#onKeyUp(int, android.view.KeyEvent)
+     * @see Activity#onKeyUp(int, KeyEvent)
      */
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -1171,7 +1218,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
-     * Opens / close the search interface
+     * Opens / close the share interface
      */
     protected void share() {
         if (BuildConfig.DEBUG)
@@ -1181,6 +1228,20 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         sendIntent.putExtra(Intent.EXTRA_TEXT, mPageSystem.getAllText(mEditor.getText().toString()));
         sendIntent.setType("text/plain/file/audio/video");
         startActivity(sendIntent);
+    }
+
+    /**
+     * Opens / close the print interface
+     */
+    public void print() {
+        PrintManager printManager = (PrintManager) this
+                .getSystemService(Context.PRINT_SERVICE);
+
+        String jobName = this.getString(R.string.app_name) +
+                " Document";
+
+        printManager.print(jobName, new MyPrintDocumentAdapter(this, mPageSystem, mEditor),
+                null);
     }
 
     /**
@@ -1208,7 +1269,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(), mPattern);
         matchFound = mMatcher.find(selection);
         i = mPageSystem.getCurrentPage();
 
@@ -1275,7 +1336,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mMatcher = mMatcher.region(0, selection);
 
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(), mPattern);
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
@@ -1383,7 +1444,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             if (!mCaseSensitive.isChecked()) {
                 mPattern = Pattern.compile(mPattern.pattern(), mPattern.flags() | Pattern.CASE_INSENSITIVE);
             }
-        } catch (java.util.regex.PatternSyntaxException e) {
+        } catch (PatternSyntaxException e) {
             Crouton.showText(this, R.string.toast_search_patter_incorrect, Style.INFO);
             return null;
         }
@@ -1407,7 +1468,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         return result;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> checkAllMatchesPerPage(int page, Pattern pattern){
+    protected ArrayList<Pair<Integer, Integer>> checkAllMatchesPerPage(int page, Pattern pattern) {
         ArrayList<Pair<Integer, Integer>> result = new ArrayList<Pair<Integer, Integer>>();
         Matcher mMatcher = pattern.matcher(mPageSystem.getPageText(page));
 
@@ -1525,7 +1586,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * Opens the settings activity
      */
     protected void fullscreenMode(boolean checked) {
-        if(checked) {
+        if (checked) {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
@@ -1769,5 +1830,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     protected Timer mTimer;
     protected boolean mfullscreenChecked;
+
+
 
 }
