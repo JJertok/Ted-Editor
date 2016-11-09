@@ -1,6 +1,5 @@
 package fr.xgouchet.texteditor;
 
-import static android.text.Selection.getSelectionStart;
 import static fr.xgouchet.androidlib.data.FileUtils.deleteItem;
 import static fr.xgouchet.androidlib.data.FileUtils.getCanonizePath;
 import static fr.xgouchet.androidlib.data.FileUtils.renameItem;
@@ -11,14 +10,10 @@ import static fr.xgouchet.androidlib.ui.activity.ActivityDecorator.showMenuItemA
 import static fr.xgouchet.texteditor.common.RecentFiles.getLastPath;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
@@ -34,27 +29,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.graphics.pdf.PdfDocument;
-import android.icu.text.SimpleDateFormat;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.CancellationSignal;
-import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.print.PageRange;
-import android.print.PrintAttributes;
-import android.print.PrintDocumentAdapter;
-import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
-import android.print.pdf.PrintedPdfDocument;
-import android.provider.DocumentsContract;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -68,7 +47,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -94,20 +72,11 @@ import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
+
 import com.software.shell.fab.ActionButton;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     /**
      * @see Activity#onCreate(Bundle)
@@ -176,9 +145,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
     }
 
     protected void initHighlighter() {
@@ -196,9 +163,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @see Activity#onStart()
      */
     protected void onStart() {
-        super.onStart();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
+        super.onStart();
 
         TedChangelog changeLog;
         SharedPreferences prefs;
