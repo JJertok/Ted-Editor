@@ -185,7 +185,7 @@ public class PageSystem implements Constants {
         int i;
         StringBuilder allText = new StringBuilder();
         for (i = 0; i < pages.size(); i++) {
-            allText.append(pages.get(i));
+            allText.append(pages.get(i)).append("\n");
         }
         return allText.toString();
     }

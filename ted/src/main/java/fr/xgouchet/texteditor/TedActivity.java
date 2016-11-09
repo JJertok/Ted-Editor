@@ -776,7 +776,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             text = TextFileUtils.readTextFile(file);
             if (text != null) {
                 mInUndo = true;
-                mEditor.setText(text);
+                mPageSystem.reInitPageSystem(text);
+                this.goToPage(0, false);
+                showPagesButton();
                 TextFileUtils.writeTextFile(mCurrentFilePath,text);
                 mWatcher = new TextChangeWatcher();
                 mDirty = false;
@@ -879,7 +881,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mReadOnly = false;
         mDirty = false;
         updateTitle();
-        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mEditor.getText().toString());
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mPageSystem.getAllText(mEditor.getText().toString()));
         Crouton.showText(this, R.string.toast_save_success, Style.CONFIRM);
 
         runAfterSave();
@@ -891,6 +893,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         }
         mPageSystem.savePage(mEditor.getText().toString());
         String text = mPageSystem.getAllText(mEditor.getText().toString());
+        mVersions.saveVersion(String.valueOf(mCurrentFilePath.hashCode()), mPageSystem.getAllText(mEditor.getText().toString()));
         if (text.length() == 0)
             return;
 
