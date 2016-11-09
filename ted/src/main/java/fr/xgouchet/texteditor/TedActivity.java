@@ -19,6 +19,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -33,6 +34,7 @@ import android.graphics.Rect;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.print.PrintManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -46,7 +48,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -58,6 +59,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import de.neofonie.mobile.app.android.widget.crouton.Crouton;
 import de.neofonie.mobile.app.android.widget.crouton.Style;
 import fr.xgouchet.texteditor.common.Constants;
+import fr.xgouchet.texteditor.common.MyPrintDocumentAdapter;
 import fr.xgouchet.texteditor.common.PageSystem;
 import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
@@ -72,13 +74,14 @@ import fr.xgouchet.texteditor.ui.listener.UpdateSettingListener;
 import fr.xgouchet.texteditor.ui.view.AdvancedEditText;
 import fr.xgouchet.texteditor.undo.TextChangeWatcher;
 
+
 import com.software.shell.fab.ActionButton;
 
 public class TedActivity extends Activity implements Constants, TextWatcher,
         OnClickListener, UpdateSettingListener, CompoundButton.OnCheckedChangeListener, OnKeyboardVisibilityListener {
 
     /**
-     * @see android.app.Activity#onCreate(android.os.Bundle)
+     * @see Activity#onCreate(Bundle)
      */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -345,6 +348,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         addMenuItem(menu, MENU_ID_SHARE, R.string.menu_share,
                 R.drawable.ic_menu_share);
 
+        addMenuItem(menu, MENU_ID_PRINT, R.string.menu_print,
+                R.drawable.ic_menu_print);
+
         if (RecentFiles.getRecentFiles().size() > 0)
             addMenuItem(menu, MENU_ID_OPEN_RECENT, R.string.menu_open_recent,
                     R.drawable.ic_menu_recent);
@@ -406,6 +412,9 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
             case MENU_ID_SHARE:
                 share();
+                break;
+            case MENU_ID_PRINT:
+                print();
                 break;
             case MENU_ID_SETTINGS:
                 settingsActivity();
@@ -1261,6 +1270,20 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     }
 
     /**
+     * Opens / close the print interface
+     */
+    public void print() {
+        PrintManager printManager = (PrintManager) this
+                .getSystemService(Context.PRINT_SERVICE);
+
+        String jobName = this.getString(R.string.app_name) +
+                " Document";
+
+        printManager.print(jobName, new MyPrintDocumentAdapter(this, mPageSystem, mEditor),
+                null);
+    }
+
+    /**
      * Uses the user input to search a file
      */
     protected void searchNext() {
@@ -1285,7 +1308,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(), mPattern);
         matchFound = mMatcher.find(selection);
         i = mPageSystem.getCurrentPage();
 
@@ -1352,7 +1375,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         mMatcher = mMatcher.region(0, selection);
 
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
-        checkAllMatchesPerPage(mPageSystem.getCurrentPage(),mPattern);
+        checkAllMatchesPerPage(mPageSystem.getCurrentPage(), mPattern);
         while (mMatcher.find()) {
             prev = mMatcher.start();
             size = mMatcher.end() - mMatcher.start();
@@ -1460,7 +1483,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             if (!mCaseSensitive.isChecked()) {
                 mPattern = Pattern.compile(mPattern.pattern(), mPattern.flags() | Pattern.CASE_INSENSITIVE);
             }
-        } catch (java.util.regex.PatternSyntaxException e) {
+        } catch (PatternSyntaxException e) {
             Crouton.showText(this, R.string.toast_search_patter_incorrect, Style.INFO);
             return null;
         }
@@ -1484,7 +1507,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
         return result;
     }
 
-    protected ArrayList<Pair<Integer, Integer>> checkAllMatchesPerPage(int page, Pattern pattern){
+    protected ArrayList<Pair<Integer, Integer>> checkAllMatchesPerPage(int page, Pattern pattern) {
         ArrayList<Pair<Integer, Integer>> result = new ArrayList<Pair<Integer, Integer>>();
         Matcher mMatcher = pattern.matcher(mPageSystem.getPageText(page));
 

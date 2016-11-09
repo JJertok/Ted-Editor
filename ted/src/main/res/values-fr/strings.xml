@@ -60,6 +60,7 @@
     <string name="menu_undo">Annuler</string>
     <string name="menu_redo">Refaire</string>
     <string name="menu_share">Partager</string>
+    <string name="menu_print">Impression</string>
     <string name="menu_quit">Quitter</string>
 
     <!-- Misc UI strings -->

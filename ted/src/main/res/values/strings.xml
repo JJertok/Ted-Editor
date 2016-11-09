@@ -66,6 +66,7 @@
     <string name="menu_undo">Undo</string>
     <string name="menu_redo">Redo</string>
     <string name="menu_share">Share</string>
+    <string name="menu_print">Print</string>
     <string name="menu_quit">Quit</string>
 
     <!-- Misc UI strings -->
