@@ -83,8 +83,18 @@ public class Highlighter {
      * @param start Start of substring for checking
      * @param end   End of substring for checking
      */
-    public void highlight(CharSequence s, int start, int end) {
+    public void highlight(Editable s, int start, int end) {
+        if (mSpans == null || mStyles == null || pattern == null) return;
 
+        clear(s);
+
+        Object span = new ForegroundColorSpan(Color.parseColor("#FF0000"));
+        mSpans.add(span);
+        s.setSpan(
+                span,
+                start,
+                end,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     /**

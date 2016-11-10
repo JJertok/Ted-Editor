@@ -22,5 +22,7 @@ android {
 dependencies {
     compile project(':androidLib')
     compile 'com.github.shell-software:fab:1.1.0'
- /*   compile files('libs/juniversalchardet-1.0.3.jar')*/
+    compile files('libs/org.eclipse.cdt.core_5.6.0.201402142303.jar')
+    compile files('libs/org.eclipse.equinox.common_3.6.200.v20130402-1505.jar')
+    /*   compile files('libs/juniversalchardet-1.0.3.jar')*/
 }
