@@ -196,6 +196,7 @@ public class TextChangeWatcher implements Constants {
             mChanges.remove(0);
         }
         mCurrentChange = null;
+        mCancelledChanges.clear();
     }
 
     /**
