@@ -1,12 +1,23 @@
 package fr.xgouchet.texteditor;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.*;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest = Config.NONE)
 
 public class searchPatternTest {
-    private TedActivity ted = new TedActivity();
+    private TedActivity ted;
+    
+    @Before
+    public void setUp() {
+        ted = new TedActivity();
+    }
 
     @Test
     public void useRegexPatternTest() {
