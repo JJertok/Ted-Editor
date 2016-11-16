@@ -82,7 +82,8 @@ public class TextChangeWatcher implements Constants {
      */
     public void beforeChange(CharSequence s, int start, int count, int after, int page) {
         if ((mCurrentChange != null)
-                && (mCurrentChange.canMergeChangeBefore(s, start, count, after))) {
+                && (
+                mCurrentChange.canMergeChangeBefore(s, start, count, after))) {
         } else {
             if (count == 0) {
                 // no existing character changed
@@ -212,7 +213,7 @@ public class TextChangeWatcher implements Constants {
         Log.d(TAG, "Current change : " + mCurrentChange.toString());
     }
 
-    protected TextChange mCurrentChange;
-    protected final Stack<TextChange> mChanges;
-    protected final Stack<TextChange> mCancelledChanges;
+    public TextChange mCurrentChange;
+    public final Stack<TextChange> mChanges;
+    public final Stack<TextChange> mCancelledChanges;
 }

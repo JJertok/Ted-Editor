@@ -23,7 +23,6 @@ dependencies {
     compile project(':androidLib')
     compile 'com.github.shell-software:fab:1.1.0'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:2.4'
-
- /*   compile files('libs/juniversalchardet-1.0.3.jar')*/
+    testCompile 'org.robolectric:robolectric:3.0'
+    /*   compile files('libs/juniversalchardet-1.0.3.jar')*/
 }

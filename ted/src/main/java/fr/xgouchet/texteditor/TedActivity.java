@@ -471,13 +471,23 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             return;
 
         boolean bracketsChanged = true;
-
+        String secondBracket;
         if (Settings.UNDO && (mWatcher != null)) {
 
             if (s.length() > beforeLength) {
 
                 mInBrackets = true;
-                bracketsChanged = bracketsController(s, start);
+                secondBracket = bracketsController(s, start);
+
+                if (!secondBracket.equals("")) {
+                    s = insertInString(s, secondBracket, start + 1);
+                    mPageSystem.savePage(mEditor.getText().toString());
+                    mWatcher.afterChange(s.toString(), start, 0, 2, mPageSystem.getCurrentPage());
+                    mEditor.getText().insert(start + 1, "" + secondBracket);
+                    mEditor.setSelection(start + 1);
+                }
+
+
                 mInBrackets = false;
             }
             if (!bracketsChanged) {
@@ -491,7 +501,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @param s     Base char sequence with some of brackets at the end
      * @param start Index of first added element
      */
-    public boolean bracketsController(CharSequence s, int start) {
+    public String bracketsController(CharSequence s, int start) {
         String secondBracket = "";
 
         switch (s.charAt(start)) {
@@ -509,13 +519,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 break;
         }
 
-        if (secondBracket.equals("")) return false;
-        s = insertInString(s, secondBracket, start + 1);
-        mPageSystem.savePage(mEditor.getText().toString());
-        mWatcher.afterChange(s.toString(), start, 0, 2, mPageSystem.getCurrentPage());
-        mEditor.getText().insert(start + 1, "" + secondBracket);
-        mEditor.setSelection(start + 1);
-        return true;
+        return secondBracket;
     }
 
     /**
