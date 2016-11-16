@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class searchPatternTest {
     private TedActivity ted;
-    
+
     @Before
     public void setUp() {
         ted = new TedActivity();
