@@ -787,7 +787,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
                 mPageSystem.reInitPageSystem(text);
                 this.goToPage(0, false);
                 showPagesButton();
-                TextFileUtils.writeTextFile(mCurrentFilePath,text);
+                TextFileUtils.writeTextFile(mCurrentFilePath, text);
                 mWatcher = new TextChangeWatcher();
                 mDirty = false;
                 mInUndo = false;
@@ -810,6 +810,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         return false;
     }
+
     /**
      * Open the last backup file
      *
@@ -1094,7 +1095,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected void openFileVersions() {
         if (BuildConfig.DEBUG)
             Log.d(TAG, "openFileVersions");
-        if(mVersions.loadVersions(String.valueOf(mCurrentFilePath.hashCode())).size()==0) return;
+        if (mVersions.loadVersions(String.valueOf(mCurrentFilePath.hashCode())).size() == 0) return;
 
         mAfterSave = new Runnable() {
             public void run() {
@@ -1303,7 +1304,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             return;
         }
 
-        mPattern = createSearchPattern(search);
+        mPattern = createSearchPattern(search, mUseRegex.isChecked(), mWholeWord.isChecked(), mCaseSensitive.isChecked());
         if (mPattern == null) return;
         mMatcher = mPattern.matcher(text);
         matches = checkAllMatches(mPageSystem.getAllText(mEditor.getText().toString()), mPattern);
@@ -1367,7 +1368,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             return;
         }
 
-        mPattern = createSearchPattern(search);
+        mPattern = createSearchPattern(search, mUseRegex.isChecked(), mWholeWord.isChecked(), mCaseSensitive.isChecked());
         if (mPattern == null) return;
 
         mMatcher = mPattern.matcher(text);
@@ -1463,23 +1464,23 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      * @param search entered search string
      * @return patter for searching.
      */
-    protected Pattern createSearchPattern(String search) {
+    protected Pattern createSearchPattern(String search, Boolean useRegex, Boolean wholeWord, Boolean caseSensitive) {
 
         Pattern mPattern;
         try {
             //Check search mode with regex or not.
-            if (mUseRegex.isChecked()) {
+            if (useRegex) {
                 mPattern = Pattern.compile(search, Pattern.MULTILINE);
             } else {
                 search = escapeRegex(search);
                 mPattern = Pattern.compile(search);
 
-                if (mWholeWord.isChecked()) {
+                if (wholeWord) {
                     mPattern = Pattern.compile("\\b" + search + "\\b");
                 }
             }
             //Check sensitive mode (default sensitive make recompile for changing)
-            if (!mCaseSensitive.isChecked()) {
+            if (!caseSensitive) {
                 mPattern = Pattern.compile(mPattern.pattern(), mPattern.flags() | Pattern.CASE_INSENSITIVE);
             }
         } catch (PatternSyntaxException e) {
@@ -1571,7 +1572,7 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
             Crouton.showText(this, R.string.toast_search_no_input, Style.INFO);
             return;
         }
-        mPattern = createSearchPattern(searchStr.toString());
+        mPattern = createSearchPattern(searchStr.toString(), mUseRegex.isChecked(), mWholeWord.isChecked(), mCaseSensitive.isChecked());
 
         if (mPattern.matcher(textBefore).find()) {
             mInReplace = true;
