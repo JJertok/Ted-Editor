@@ -1,5 +1,8 @@
 package fr.xgouchet.texteditor.syntax;
 
+import android.content.Context;
+import android.util.Log;
+
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTAttribute;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
@@ -15,6 +18,7 @@ import org.eclipse.cdt.core.parser.IncludeFileContentProvider;
 import org.eclipse.cdt.core.parser.ScannerInfo;
 import org.eclipse.cdt.internal.core.dom.parser.cpp.CPPASTProblemDeclaration;
 
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +29,7 @@ import java.util.Map;
 public class ASTBuilder {
     public void Parse(String filePath)
             throws Exception {
-        FileContent fileContent = FileContent.createForExternalFileLocation("C:\\Users\\1\\Documents\\Innopolis\\1\\Methods\\docs\\TestFile.cpp");
+        FileContent fileContent = FileContent.createForExternalFileLocation(filePath);
         Map definedSymbols = new HashMap();
         String[] includePaths = new String[0];
         IScannerInfo info = new ScannerInfo(definedSymbols, includePaths);
@@ -35,10 +39,6 @@ public class ASTBuilder {
 
         int opts = 8;
         IASTTranslationUnit translationUnit = GPPLanguage.getDefault().getASTTranslationUnit(fileContent, info, emptyIncludes, null, opts, log);
-        IASTPreprocessorIncludeStatement[] includes = translationUnit.getIncludeDirectives();
-        for (IASTPreprocessorIncludeStatement include : includes) {
-            System.out.println("include - " + include.getName());
-        }
 
         printTree(translationUnit, 1);
 
@@ -72,13 +72,36 @@ public class ASTBuilder {
 
         if(node instanceof CPPASTProblemDeclaration) {
             System.out.println(node);
-            System.out.println(((CPPASTProblemDeclaration) node).getOffset());
-            System.out.println(((CPPASTProblemDeclaration) node).getLength());
+            Log.d("TED", ((CPPASTProblemDeclaration) node).getOffset() + "");
+//            System.out.println(((CPPASTProblemDeclaration) node).getOffset());
+//            System.out.println(((CPPASTProblemDeclaration) node).getLength());
         }
 
         for (IASTNode chNode:
                 node.getChildren()) {
             printTree(chNode, 0);
         }
+    }
+
+
+    public void Check(String text, Context ctx) {
+        String filename = "checker.cpp";
+
+        FileOutputStream outputStream;
+
+        try {
+            outputStream = ctx.openFileOutput(filename, Context.MODE_PRIVATE);
+            outputStream.write(text.getBytes());
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Parse(ctx.getFilesDir() + "/" + filename);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

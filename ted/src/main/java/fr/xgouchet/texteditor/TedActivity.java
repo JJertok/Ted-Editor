@@ -63,6 +63,7 @@ import fr.xgouchet.texteditor.common.RecentFiles;
 import fr.xgouchet.texteditor.common.Settings;
 import fr.xgouchet.texteditor.common.TedChangelog;
 import fr.xgouchet.texteditor.common.TextFileUtils;
+import fr.xgouchet.texteditor.syntax.ASTBuilder;
 import fr.xgouchet.texteditor.syntax.Highlighter;
 import fr.xgouchet.texteditor.syntax.TokenReader;
 import fr.xgouchet.texteditor.ui.listener.ButtonPanelListener;
@@ -143,6 +144,8 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
 
         //Check Keyboard visibility
         setKeyboardVisibilityListener(this);
+
+        mAstBuilder = new ASTBuilder();
     }
 
     protected void initHighlighter() {
@@ -516,9 +519,16 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
      */
     public void afterTextChanged(Editable s) {
 
+
         if (Settings.HIGHLIGHT_SYNTAX) {
             updateHightlightSettings();
             highlighter.highlight(s);
+
+            if(Settings.LANGUAGE == 0) {
+                String allText = mPageSystem.getAllText(mPageSystem.getCurrentPageText());
+                mAstBuilder.Check(allText, getApplicationContext());
+            }
+
         } else {
             highlighter.clear(s);
         }
@@ -1770,4 +1780,6 @@ public class TedActivity extends Activity implements Constants, TextWatcher,
     protected Timer mTimer;
     protected boolean mfullscreenChecked;
 
+
+    protected ASTBuilder mAstBuilder;
 }
