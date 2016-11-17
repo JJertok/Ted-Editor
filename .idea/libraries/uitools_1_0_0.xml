@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="uitools-1.0.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/uitools/1.0.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/uitools/1.0.0/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.shell-software/uitools/1.0.0/f55979acfb783ec5f095fa7078797276f6782ae2/uitools-1.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

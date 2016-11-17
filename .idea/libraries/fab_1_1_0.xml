@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="fab-1.1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/fab/1.1.0/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/fab/1.1.0/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.shell-software/fab/1.1.0/74f4f10c5ef8c25705c06b0047ad937f9a96723f/fab-1.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

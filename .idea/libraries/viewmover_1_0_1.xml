@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="viewmover-1.0.1">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/viewmover/1.0.1/res" />
+      <root url="jar://$PROJECT_DIR$/ted/build/intermediates/exploded-aar/com.github.shell-software/viewmover/1.0.1/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.shell-software/viewmover/1.0.1/7a565bd431ae0dfd66eeb0a3d5dc790f1735f7ac/viewmover-1.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
